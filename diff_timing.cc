@@ -31,12 +31,14 @@ void diff_timing(){
     
     if(title.find("module_total")!=string::npos){
       names730.push_back(key730->GetName());
-
-
+      cout<<"histname: "<<h->GetName()<<" keyname: "<<key730->GetName()<<endl;
+      outfile<<h->GetName()<<endl;
     }
 
   }
-
+  outfile<<endl;
+  outfile<<"******************NOW 740 NAMES****************"<<endl;
+  outfile<<endl;
 
   TFile* file740 = new TFile("DQM_Timing_CMSSW740patch1_frozenMenu_PU40bx25.root");
   file740->cd("DQMData/Run 1/HLT/Run summary/TimerService/Running 1 processes/process HLTX/Paths");
@@ -52,6 +54,7 @@ void diff_timing(){
     string title = h->GetName();
     if(title.find("module_total")!=string::npos){
        names740.push_back(h->GetName());
+       outfile<<h->GetName()<<endl;
        }
   }
 
@@ -69,19 +72,22 @@ void diff_timing(){
   vector<float> vres;
   vector<int> viter;
 
+  outfile<<endl;
+  outfile<<"********************Matched Names Now*************************"<<endl;
+
   for(int i=0; i<nmax; i++){
 
     string histname730 = "DQMData/Run 1/HLT/Run summary/TimerService/Running 1 processes/process HLTX/Paths/"+names730[i];
-    if(i>80) cout<<names730[i]<<endl;
+    //if(i>80) cout<<names730[i]<<endl;
     //cout<<histname730<<endl;
-    for(int j =0; j < 100; j++){
+    for(int j =0; j < names740.size(); j++){
 
       //cout<<"730: "<<names730[i]<<" 740: "<<names740[j]<<endl;
       if(!(names730[i]==names740[j]) )continue;
       string histname740 = "DQMData/Run 1/HLT/Run summary/TimerService/Running 1 processes/process HLTX/Paths/"+names740[i];
       //cout<<histname740<<endl;
-      
-      cout<<histname730<<endl;
+      outfile<<names740[j]<<endl;
+      //cout<<histname730<<endl;
       TH1F* hist730 = (TH1F*)file730->Get(histname730.c_str());
       TH1F* hist740 = (TH1F*)file740->Get(histname740.c_str());
       float diff = hist730->GetMean() - hist740->GetMean();
@@ -89,7 +95,7 @@ void diff_timing(){
       if(hist730->GetMean()!=0){
 	percentdiff = (diff/hist730->GetMean())*100.;
       }
-      outfile<<diff<<endl;
+      //outfile<<diff<<endl;
       if(percentdiff<100 && percentdiff>-200){
 	vres.push_back(percentdiff);
 	viter.push_back(i);
