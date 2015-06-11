@@ -107,7 +107,7 @@ void TimingAndRates(float time, std::string filename,int run=1,std::string outna
   }
 
 
-
+  outfile<<"Path,TotalTime(ms),Rate(Hz)\n";
   for(unsigned int k =0; k<vNames.size(); k++){
     outfile<<vNames.at(k)<<","<<vTimes.at(k)<<","<<vRates.at(k)<<std::endl;
   }
