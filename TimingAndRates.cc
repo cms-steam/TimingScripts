@@ -9,7 +9,7 @@
 #include "TROOT.h"
 using namespace std;
 
-void test(float time, std::string filename,std::string outname="HLT_Paths_TimingAndRates.csv"){
+void TimingAndRates(float time, std::string filename,std::string outname="HLT_Paths_TimingAndRates.csv"){
 
 
   vector<string> vNames;
