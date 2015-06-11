@@ -65,6 +65,7 @@ void test(float time, std::string filename){
   TIter next2(gDirectory->GetListOfKeys());
   TKey *key2;
 
+
   while ((key2 = (TKey*)next2())) {
     TClass *cl = gROOT->GetClass(key2->GetClassName());
     if (!cl->InheritsFrom("TH1")) continue;
@@ -81,6 +82,16 @@ void test(float time, std::string filename){
       pos=title.find("v1");
     }
     string path(title,0,pos-1);
+
+    //make sure path is in rates
+    bool inRates=false;
+    for(size_t j=0; j<vNames.size();j++){
+      if(path==vNames.at(j)) inRates=true;
+    }
+    
+    if(!inRates) continue;
+
+
     if(name.find("total")!=string::npos && name.find("module_total")==string::npos){
       //handle special case with 'totalOR' in name
       if(name.find("totalOR")!=string::npos && !(name.find("total",name.find("total"+1))!=string::npos)) continue;
@@ -94,8 +105,8 @@ void test(float time, std::string filename){
 
 
 
-  for(unsigned int j =0; j<vNames.size(); j++){
-    outfile<<vNames.at(j)<<","<<vTimes.at(j)<<","<<vRates.at(j)<<std::endl;
+  for(unsigned int k =0; k<vNames.size(); k++){
+    outfile<<vNames.at(k)<<","<<vTimes.at(k)<<","<<vRates.at(k)<<std::endl;
   }
 
 
