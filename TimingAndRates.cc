@@ -9,7 +9,7 @@
 #include "TROOT.h"
 using namespace std;
 
-void TimingAndRates(float time, std::string filename,std::string outname="HLT_Paths_TimingAndRates.csv"){
+void TimingAndRates(float time, std::string filename,int run=1,std::string outname="HLT_Paths_TimingAndRates.csv",std::string process="HLTX"){
 
 
   vector<string> vNames;
@@ -20,7 +20,8 @@ void TimingAndRates(float time, std::string filename,std::string outname="HLT_Pa
   ofstream outfile(outname.c_str());
 
   TFile* file = new TFile(filename.c_str());
-  file->cd("DQMData/Run 1/HLT/Run summary/TimerService/Running 1 processes/process HLTX/Paths");
+
+  file->cd(Form("DQMData/Run %i/HLT/Run summary/TimerService/Running 1 processes/process %s/Paths",run,process));
 
   TIter next(gDirectory->GetListOfKeys());
   TKey *key;
