@@ -9,7 +9,7 @@
 #include "TROOT.h"
 using namespace std;
 
-void test(float time, std::string filename){
+void test(float time, std::string filename,std::string outname="HLT_Paths_TimingAndRates.csv"){
 
 
   vector<string> vNames;
@@ -17,7 +17,7 @@ void test(float time, std::string filename){
   vector<float> vRates;
 
 
-  ofstream outfile("HLT_Paths_Total_Time_CMSSW742_pu40bx25.csv");
+  ofstream outfile(outname.c_str());
 
   TFile* file = new TFile(filename.c_str());
   file->cd("DQMData/Run 1/HLT/Run summary/TimerService/Running 1 processes/process HLTX/Paths");
