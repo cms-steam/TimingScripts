@@ -5,6 +5,7 @@
 #include "TKey.h"
 #include "TCollection.h"
 #include <iostream>
+#include <sstream>
 #include <string>
 #include "TROOT.h"
 using namespace std;
@@ -20,8 +21,9 @@ void TimingAndRates(float time, std::string filename,int run=1,std::string outna
   ofstream outfile(outname.c_str());
 
   TFile* file = new TFile(filename.c_str());
-
-  file->cd(Form("DQMData/Run %i/HLT/Run summary/TimerService/Running 1 processes/process %s/Paths",run,process));
+  std::stringstream dirname;
+  dirname<<"DQMData/Run "<<run<<"/HLT/Run summary/TimerService/Running 1 processes/process "<<process<<"/Paths";
+  file->cd( (dirname.str()).c_str() );
 
   TIter next(gDirectory->GetListOfKeys());
   TKey *key;
@@ -100,7 +102,7 @@ void TimingAndRates(float time, std::string filename,int run=1,std::string outna
       //      std::cout<<name<<" with mean: "<<h->GetMean()<<std::endl;
       mean = h->GetMean();
       vTimes.push_back(mean);
-      std::cout<<" path in timing: "<<path<<std::endl;
+     
     }
   }
 
