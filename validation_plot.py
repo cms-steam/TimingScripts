@@ -76,7 +76,7 @@ while j<len(Tfiles):
     j+=1
 
 k=0
-leg = TLegend(0.5,0.6,0.9,0.9,"")
+leg = TLegend(0.4,0.6,0.9,0.9,"")
 leg.SetFillStyle(0)
 leg.SetBorderSize(0)
 
@@ -84,15 +84,15 @@ while k< len(Thists):
     print type(Thists[k])
     if k==0:
         Thists[k].Draw()
+        name = files[k]+" with Mean: %3.2f" % Thists[k].GetMean()
         Thists[k].GetXaxis().SetRangeUser(0,2000)
         Thists[k].SetLineWidth(2)
-        name = files[k]
         leg.AddEntry(Thists[k],name,"l")
     else:
         Thists[k].SetLineWidth(2)
         Thists[k].SetLineColor(k)
         Thists[k].Draw("same")
-        name=files[k]
+        name=files[k]+" with Mean: %3.2f" % Thists[k].GetMean()
         leg.AddEntry(Thists[k],name,"l")
     k+=1
 
