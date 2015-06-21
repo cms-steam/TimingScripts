@@ -14,7 +14,10 @@ args=parser.parse_args()
 
 
 #import root libraries
-from ROOT import gROOT, TCanvas, TH1F, TFile 
+from ROOT import gROOT, TCanvas, TH1F, TFile, TLegend, gStyle
+
+#remove stat box
+gStyle.SetOptStat(False)
 
 #deal with parsing arguments correctly
 multi=False
@@ -73,18 +76,27 @@ while j<len(Tfiles):
     j+=1
 
 k=0
+leg = TLegend(0.5,0.6,0.9,0.9,"")
+leg.SetFillStyle(0)
+leg.SetBorderSize(0)
+
 while k< len(Thists):
     print type(Thists[k])
     if k==0:
         Thists[k].Draw()
         Thists[k].GetXaxis().SetRangeUser(0,2000)
         Thists[k].SetLineWidth(2)
+        name = files[k]
+        leg.AddEntry(Thists[k],name,"l")
     else:
         Thists[k].SetLineWidth(2)
         Thists[k].SetLineColor(k)
         Thists[k].Draw("same")
+        name=files[k]
+        leg.AddEntry(Thists[k],name,"l")
     k+=1
 
+leg.Draw("same")
 
 c1.Print("HLT_Validation_Plot.pdf")
  
