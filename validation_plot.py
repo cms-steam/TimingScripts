@@ -12,7 +12,48 @@ parser.add_argument("--processes",type=str,help='the corresponding process names
 
 args=parser.parse_args()
 
+
+
 from ROOT import gROOT, TCanvas, TH1, TFile 
+
+multi=False
+if args.inputfiles[0].find(","):
+    files=args.inputfiles[0].split(",")
+    if args.runs:
+        runs=args.runs[0].split(",")
+    else:
+        j=0
+        runs=[]
+        while j<len(files):
+            runs.append("1")
+            j+=1
+    if args.processes:
+        processes=args.processes[0].split(",")
+    else:
+        k=0
+        processes=[]
+        while k < len(files):
+            processes.append("HLTX")
+            k+=1
+    multi=True
+else:
+    files=args.inputfiles[0]
+    if args.runs:
+        runs=args.runs[0]
+    else:
+        runs=['1']
+    if args.processes:
+        processes=args.processes[0]
+    else:
+        processes=['HLTX']
+
+i=0
+while i<len(files):
+    print "Adding file: %s to list of files to run with Run Number: %s and Process Name: %s" % (files[i],runs[i],processes[i])
+    i+=1
+
+
+
 
 #clear memory 
 gROOT.Reset()
