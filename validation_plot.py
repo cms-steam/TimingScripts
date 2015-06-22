@@ -10,6 +10,8 @@ parser.add_argument("--inputfiles", type=str, help='The list of input files, com
 parser.add_argument("--runs",type=str,help='the corresponding run numbers, set to 1 by default',nargs=1)
 parser.add_argument("--processes",type=str,help='the corresponding process names, set to HLTX by default',nargs=1)
 parser.add_argument("--log",dest='log',action='store_true',help='specify to set log scale on the plot')
+parser.add_argument("--ext",dest='ext',action='store_true',help='specify to set extended x-axis')
+parser.add_argument("--outfile",type=str,help='optional outfile name',nargs=1)
 args=parser.parse_args()
 
 
@@ -81,22 +83,41 @@ leg.SetFillStyle(0)
 leg.SetBorderSize(0)
 
 while k< len(Thists):
-    print type(Thists[k])
+    #work to get nice entry name
+    if not files[k].find("PU")==-1:
+        pu='PU'+(files[k].split("PU")[1]).split("_")[0]
+    else:
+        pu=''
+    if not files[k].find("GRun")==-1:
+        menu=''
+#        menu='GRun'+(files[k].split('GRun')[1]).split('_')[0]
+    else:
+        menu=''
+    name = pu+' '+menu+" Mean: %3.2f ms" % Thists[k].GetMean()
     if k==0:
-        Thists[k].Draw()
-        name = files[k]+" with Mean: %3.2f" % Thists[k].GetMean()
-        Thists[k].GetXaxis().SetRangeUser(0,2000)
+        Thists[k].GetYaxis().SetRangeUser(0.000008,0.2)
+        if args.ext:
+            Thists[k].GetXaxis().SetRangeUser(0,2000)
+        else:
+            Thists[k].GetXaxis().SetRangeUser(0,400)
+        Thists[k].Scale( 1.0 / Thists[k].Integral() )
         Thists[k].SetLineWidth(2)
+        Thists[k].SetLineColor(k+1)
+        Thists[k].Draw()
         leg.AddEntry(Thists[k],name,"l")
     else:
+        Thists[k].Scale( 1.0 / Thists[k].Integral() )
         Thists[k].SetLineWidth(2)
-        Thists[k].SetLineColor(k)
+        Thists[k].SetLineColor(k+1)
         Thists[k].Draw("same")
-        name=files[k]+" with Mean: %3.2f" % Thists[k].GetMean()
         leg.AddEntry(Thists[k],name,"l")
     k+=1
 
 leg.Draw("same")
 
-c1.Print("HLT_Validation_Plot.pdf")
+if args.outfile:
+    filename=args.outfile[0]
+else:
+    filename='HLT_Validation_Plot.pdf'
+c1.Print(filename)
  
