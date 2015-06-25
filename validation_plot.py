@@ -93,7 +93,13 @@ while k< len(Thists):
 #        menu='GRun'+(files[k].split('GRun')[1]).split('_')[0]
     else:
         menu=''
-    name = pu+' '+menu+" Mean: %3.2f ms" % Thists[k].GetMean()
+    #now do release
+    if not files[k].find("CMSSW")==-1:
+        release='CMSSW_'+(files[k].split("CMSSW")[1]).split("_")[0]
+    else:
+        release=''
+    #write name in full
+    name = pu+' '+menu+' '+release+" Mean: %3.2f ms" % Thists[k].GetMean()
     if k==0:
         Thists[k].GetYaxis().SetRangeUser(0.000008,0.2)
         if args.ext:
