@@ -15,7 +15,7 @@ import argparse
 #args=parser.parse_args()
 
 #print args.BigCSVFile[0]
-
+#Edit this line to tell it which csv files to pad
 filelist=['HLT_Paths_Total_Time_CMSSW732p3_pu40bx25.csv','HLT_Paths_Total_Time_CMSSW740p1_pu40bx25.csv','HLT_Paths_Total_Time_CMSSW742_pu40bx25.csv']
 
 masterlist=[]
