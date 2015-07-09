@@ -1,9 +1,9 @@
 #!/bin/bash
 
-for i in $(seq 1 1 32)
+for i in $(seq 1 1 50)
 do
-    file="hlt_.py"
- 
+    file="hlt_50nsJuneFrozenMenu_Data_ResTest.py"
+    newfile="hlt_50nsJuneFrozenMenu_Data_ResTest_job"$i".py"
 #    cp $file $newfile
     sed="jobNumber"$i
 #    mv $newfile $newfile.old
