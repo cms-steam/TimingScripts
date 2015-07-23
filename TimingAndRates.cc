@@ -24,7 +24,7 @@ void TimingAndRates(float time, std::string filename,int run=1,std::string outna
   std::stringstream dirname;
   dirname<<"DQMData/Run "<<run<<"/HLT/Run summary/TimerService/Running 1 processes/process "<<process<<"/Paths";
   file->cd( (dirname.str()).c_str() );
-  std::cout<<dirname<<std::endl;
+  std::cout<<dirname.str()<<std::endl;
   TIter next(gDirectory->GetListOfKeys());
   TKey *key;
   
