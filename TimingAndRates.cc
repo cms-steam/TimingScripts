@@ -4,10 +4,12 @@
 #include "TFile.h"
 #include "TKey.h"
 #include "TCollection.h"
-#include <iostream>
 #include <sstream>
+#include <fstream>
 #include <string>
 #include "TROOT.h"
+#include "TClass.h"
+#include "TH1.h"
 using namespace std;
 
 void TimingAndRates(float time, std::string filename,int run=1,std::string outname="HLT_Paths_TimingAndRates.csv",std::string process="HLTX"){
@@ -17,7 +19,8 @@ void TimingAndRates(float time, std::string filename,int run=1,std::string outna
   std::vector<float> vTimes;
   std::vector<float> vRates;
  
-
+  std::cout<<outname<<std::endl;
+  std::cout<<filename<<std::endl;
   ofstream outfile(outname.c_str());
 
   TFile* file = new TFile(filename.c_str());
@@ -44,7 +47,6 @@ void TimingAndRates(float time, std::string filename,int run=1,std::string outna
       pos=title.find("v1");
     }
     string path(title,0,pos-1);
-    float mean;
     float rate;
 
     if(title.find("module counter")!=string::npos){
@@ -76,6 +78,7 @@ void TimingAndRates(float time, std::string filename,int run=1,std::string outna
     //    names.push_back(h->GetName());
     string title = h->GetTitle();
     string name = h->GetName();
+    float mean;
     size_t pos;
 
     if(title.find("v2")!=string::npos){
