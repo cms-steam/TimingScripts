@@ -90,7 +90,7 @@ while k< len(Thists):
         pu=''
     if not files[k].find("GRun")==-1:
         menu=''
-#        menu='GRun'+(files[k].split('GRun')[1]).split('_')[0]
+        menu='GRun'+(files[k].split('GRun')[1]).split('_')[0]
     else:
         menu=''
     #now do release
