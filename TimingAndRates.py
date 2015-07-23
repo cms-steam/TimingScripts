@@ -32,7 +32,7 @@ if args.data:
     if not args.lumis:
         print "Error! Need to specify lumis when running on data"
         quit()
-    elif not args.run:
+    if not args.run:
         print "Error! Need to specify run number"
         quit()
     else:
@@ -50,15 +50,15 @@ cmdstring=''
 
 if args.outfile:
     print 'Customizing to make output file', args.outfile[0]
-    if args.data:
-        cmdstring='root -b -q -l \'TimingAndRates.cc(%f,\"%s\",%i,\"%s\",\"HLT\")\'' % (nSeconds,args.inputfile[0],run,args.outfile[0])
+    if args.process:
+        cmdstring='root -b -q -l \'TimingAndRates.cc(%f,\"%s\",%i,\"%s\",\"%s\")\'' % (nSeconds,args.inputfile[0],run,args.outfile[0],args.process[0])
     else:
-        if args.process:
-            cmdstring='root -b -q -l \'TimingAndRates.cc(%f,\"%s\",1,\"%s\",\"%s\")\'' % (nSeconds,args.inputfile[0],args.outfile[0],args.process[0])
-        else:
-                        cmdstring='root -b -q -l \'TimingAndRates.cc(%f,\"%s\",1,\"%s\")\'' % (nSeconds,args.inputfile[0],args.outfile[0])
+        cmdstring='root -b -q -l \'TimingAndRates.cc(%f,\"%s\",%i,\"%s\")\'' % (nSeconds,args.inputfile[0],run,args.outfile[0])
 else:
-    print 'Running with default output file name'
-    cmdstring='root -b -q -l \'TimingAndRates.cc(%f,\"%s\")\'' % (nSeconds,args.inputfile[0])
+    if args.process:
+        cmdstring='root -b -q -l \'TimingAndRates.cc(%f,\"%s\",%i,\"%s\",\"%s\")\'' % (nSeconds,args.inputfile[0],run,"HLT_TimingAndRates.csv",args.process[0])
+    else:
+        cmdstring='root -b -q -l \'TimingAndRates.cc(%f,\"%s\",%i)\'' % (nSeconds,args.inputfile[0],run)
+
 
 os.system(cmdstring)
