@@ -40,7 +40,7 @@ if args.data:
         run=args.run[0]
         print "running data with %f lumis corresponding to %f seconds for run number %i" % (args.lumis[0],nSeconds,run)
 
-if not args.data or args.mc:
+if not (args.data or args.mc):
     print "Error! Need to choose either data or mc"
     quit()
 
