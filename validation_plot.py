@@ -88,31 +88,41 @@ while k< len(Thists):
         pu='PU'+(files[k].split("PU")[1]).split("_")[0]
     else:
         pu=''
-    if not files[k].find("GRun")==-1:
+    if not files[k].find("Frozen")==-1:
+        menu=''
+        menu='Frozen'+(files[k].split('Frozen')[1]).split('_')[0]
+    elif not files[k].find("GRun")==-1:
         menu=''
         menu='GRun'+(files[k].split('GRun')[1]).split('_')[0]
     else:
         menu=''
     #now do release
     if not files[k].find("CMSSW")==-1:
-        release='CMSSW_'+(files[k].split("CMSSW")[1]).split("_")[0]
+        release='CMSSW_'+(files[k].split("CMSSW")[1]).split(".")[0]
     else:
         release=''
     #write name in full
     name = pu+' '+menu+' '+release+" Mean: %3.2f ms" % Thists[k].GetMean()
     if k==0:
+        print Thists[k].Integral()
+        Thists[k].Scale( 1.0 / Thists[k].Integral() )
+        print Thists[k].Integral()
+
         Thists[k].GetYaxis().SetRangeUser(0.000008,0.2)
         if args.ext:
             Thists[k].GetXaxis().SetRangeUser(0,2000)
         else:
             Thists[k].GetXaxis().SetRangeUser(0,400)
-        Thists[k].Scale( 1.0 / Thists[k].Integral() )
+        print "lower bound of bin 100: %i" % Thists[k].GetBinCenter(100)
+        print "percentage of events running particle flow: %i " % Thists[k].Integral(100,500)
         Thists[k].SetLineWidth(2)
         Thists[k].SetLineColor(k+1)
         Thists[k].Draw()
         leg.AddEntry(Thists[k],name,"l")
     else:
+        print Thists[k].Integral()
         Thists[k].Scale( 1.0 / Thists[k].Integral() )
+        print Thists[k].Integral()
         Thists[k].SetLineWidth(2)
         Thists[k].SetLineColor(k+1)
         Thists[k].Draw("same")
