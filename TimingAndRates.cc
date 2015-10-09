@@ -46,6 +46,12 @@ void TimingAndRates(float time, std::string filename,int run=1,std::string outna
     else if(title.find("v1")!=string::npos){
       pos=title.find("v1");
     }
+    else if(title.find("v3")!=string::npos){
+      pos=title.find("v3");
+    }
+    else if(title.find("v4")!=string::npos){
+      pos=title.find("v4");
+    }
     string path(title,0,pos-1);
     float rate;
 
@@ -86,6 +92,12 @@ void TimingAndRates(float time, std::string filename,int run=1,std::string outna
     }
     else if(title.find("v1")!=string::npos){
       pos=title.find("v1");
+    }
+    else if(title.find("v3")!=string::npos){
+      pos=title.find("v3");
+    }
+    else if(title.find("v4")!=string::npos){
+      pos=title.find("v4");
     }
     string path(title,0,pos-1);
 
