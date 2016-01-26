@@ -1,10 +1,10 @@
 #!/bin/bash
 
-for i in $(seq 1 1 32)
+for i in $(seq 16 1 16)
 do
     for j in $(seq 1 1 $i)
     do
-	file="hlt_2013_TEMPLATE.py"
+	file="hlt_2013_TEMPLATE_"$1".py"
 	f1="hlt_2013_2p1v5_online_"
 	f2="j"
 	f3="c_j"
@@ -30,10 +30,10 @@ do
 	then
 	    n=8
 	fi
-	f4="_wallclock_CR_PU30.py"
-	newfile=$f1$i$f2$i$f3$j$f4
+	f4="_wallclock_CR_"$1".py"
+	newfile=$f1$i$f2$n$f3$j$f4
 	cp $file $newfile
-	sed1="xjobs_xcores/"
+	sed1=$1"/xjobs_xcores/"
 	sed2="jobs/j"
 	sed=$sed1$i$sed2$j
 	mv $newfile $newfile.old
