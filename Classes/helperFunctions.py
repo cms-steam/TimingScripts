@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
-def writeTestFile(test,f):
+import os.path
 
-    outfile = open(f,'w')
+def writeTestFile(test,outfile):
+
     outfile.write("ncores:%i\n"%test.ncores)
     outfile.write("njobs:%i\n"%test.njobs)
     outfile.write("nthreads:%i\n"%test.nthreads)
@@ -10,4 +11,12 @@ def writeTestFile(test,f):
     outfile.write("menu:%s\n"%test.baseMenu)
     outfile.write("trials:%i\n"%test.trials)
 
-    outfile.close()
+
+
+def writeMultiTestFile(mt,f):
+
+    #write test paramaters
+    for t in mt.tests:
+        writeTestFile(t,f)
+        #write blank line to separate test info
+        f.write("\n")
