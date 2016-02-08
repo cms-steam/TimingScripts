@@ -1,5 +1,8 @@
 #!/usr/bin/python
 
+import sys
+sys.path.append('../Classes/')
+
 from test import test
 from helperFunctions import *
 #grab all input
