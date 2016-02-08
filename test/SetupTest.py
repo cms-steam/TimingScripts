@@ -21,4 +21,6 @@ print test
 savefile = "test_cfg_%s.txt" % currentTest.name
 print "Saving as %s" % savefile
 
-writeTestFile(currentTest,savefile)
+outfile = open(savefile,'w')
+writeTestFile(currentTest,outfile)
+outfile.close()
