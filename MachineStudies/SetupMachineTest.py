@@ -30,6 +30,8 @@ name = raw_input('Enter any extra naming you would like the test to have (defaul
 if name != '':
     name = '_'+name
 
+name = types[type]+'_'+archs[arch]+name
+
 if type=='1':
     mTest = configureCPUScan(arch,name)
 elif type=='2':
