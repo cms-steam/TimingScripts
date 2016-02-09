@@ -25,21 +25,17 @@ def writeRunLine(core,filename,logname):
     return "nohup taskset -c %i cmsRun %s >& %s" % (core,filename,logname)
 
 
-def configureCPUScan(arch,name):
- 
-    cpus = {'1':'SandyBridge','2':'IvyBridge','3':'Haswell'}
+def copyHltMenu(t):
+    ncores = t.ncores
+    njobs = t.njobs
+    nthreads = t.nthreads
+    name = (t.baseMenu).split('.py')[0]
 
-    maxjobs = {'1':32,'2':32,'3':48}
+    cfgString = '_%sj%sc_%st_j' % (njobs,ncores,nthreads) 
 
-    print 'Configuring CPU scan for %s machine, which has max number of jobs %i. Would you like to run this or up to a smaller number?' % (cpus[arch],maxjobs[arch])
-    nJobs = int(raw_input('Enter desired number of jobs'))
-
-
-
-def configureOccScan(arch,name):
-
-
-def configureThreadScan(arch,name):
-
-
-def configureFreeScan(arch,name):
+    for i in range(1,t.trials+1):
+        trialstring = '_trial%i' % i
+        for j in range(1,njobs+1):
+            hltname = name+'_'+t.name+cfgString+str(j)+trialstring+'.py'
+            os.system('cp %s %s' % (t.baseMenu,hltname)
+        
