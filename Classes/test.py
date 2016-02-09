@@ -13,6 +13,7 @@ class test(object):
         self.trials = trials
 
 
+
 class multiTest(object):
 
     def __init__(self,name):
