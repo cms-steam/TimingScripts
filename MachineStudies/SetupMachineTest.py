@@ -32,14 +32,16 @@ if name != '':
 
 name = types[type]+'_'+archs[arch]+name
 
+hlt = raw_input('Enter path to base menu to be used for study')
+
 if type=='1':
-    mTest = configureCPUScan(arch,name)
+    mTest = configureCPUScan(arch,name,hlt)
 elif type=='2':
-    mTest = configureOccScan(arch,name)
+    mTest = configureOccScan(arch,name,h;t)
 elif type=='3':
-    mTest = configureThreadScan(arch,name)
+    mTest = configureThreadScan(arch,name,hlt)
 elif type=='4':
-    mTest = configureFreeScan(arch,name)
+    mTest = configureFreeScan(arch,name,hlt)
 else:
     print 'You did not pick a valid choice for test type! Exiting...'
     sys.exit(0)
