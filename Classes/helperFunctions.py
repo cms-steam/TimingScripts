@@ -80,7 +80,7 @@ process.fastTimerServiceClient = cms.EDAnalyzer( "FastTimerServiceClient",
 process.dqmFileSaver = cms.EDAnalyzer( "DQMFileSaver",
     convention        = cms.untracked.string( "Offline" ),
     workflow          = cms.untracked.string( "/HLT/FastTimerService/All" ),
-    dirName           = cms.untracked.string( "." ),
+    dirName           = cms.untracked.string( "DQMOUTPUTPATH" ),
     saveByRun         = cms.untracked.int32(1),
     saveByLumiSection = cms.untracked.int32(-1),
     saveByEvent       = cms.untracked.int32(-1),
@@ -92,7 +92,14 @@ process.dqmFileSaver = cms.EDAnalyzer( "DQMFileSaver",
 
 process.TimingOutput = cms.EndPath( process.fastTimerServiceClient + process.dqmFileSaver )"""
 
-def addTimingAndThroughputToMenu(menu):
+def getThreadConfiguration():
+    return """
+process.options.numberOfThreads = cms.untracked.uint32( NTHREADS )
+process.options.numberOfStreams = cms.untracked.uint32( NTHREADS ) #same number as above
+process.options.sizeOfStackForThreadsInKB = cms.untracked.uint32( 10*1024 )
+"""
+
+def customizeMenuForTiming(menu):
 
     #open file to append it
     hlt = open(menu,'a')
@@ -103,6 +110,10 @@ def addTimingAndThroughputToMenu(menu):
     hlt.write(getThroughputService)
     ##add the DQM output module
     hlt.write(getDQMModule)
+    #add multithreading customization
+    hlt.write(getThreadConfiguration)
+
+    
 
 def copyHltMenu(t):
     ncores = t.ncores
@@ -116,5 +127,10 @@ def copyHltMenu(t):
         trialstring = '_trial%i' % i
         for j in range(1,njobs+1):
             hltname = name+'_'+t.name+cfgString+str(j)+trialstring+'.py'
-            os.system('cp %s %s' % (t.baseMenu,hltname)
-        
+            base = open(t.baseMenu)
+            new = open(hltname)
+            dqmPath = t.name+"/trial%i/%ijobs/j%i/" % (i,njobs,j)
+            for line in base:
+                line = line.replace('NTHREADS',t.nThreads)
+                line = line.replace('DQMOUTPUTPATH',dqmPath)
+                new.write(line)
