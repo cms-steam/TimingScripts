@@ -25,7 +25,7 @@ def writeRunLine(core,filename,logname):
     return "nohup taskset -c %i cmsRun %s >& %s" % (core,filename,logname)
 
 def getFastTimerService():
-    return """
+    fts = """
 
 process.FastTimerService = cms.Service( "FastTimerService",
     dqmPath = cms.untracked.string( "HLT/TimerService" ),
@@ -56,6 +56,7 @@ process.FastTimerService = cms.Service( "FastTimerService",
     enableDQMbyModuleType = cms.untracked.bool( False )
 )
 """
+    return fts
 
 
 def getThroughputService():
@@ -105,13 +106,13 @@ def customizeMenuForTiming(menu):
     hlt = open(menu,'a')
     
     #add the timer service:
-    hlt.write(getFastTimerService)
+    hlt.write(getFastTimerService())
     #add the throughput service:
-    hlt.write(getThroughputService)
+    hlt.write(getThroughputService())
     ##add the DQM output module
-    hlt.write(getDQMModule)
+    hlt.write(getDQMModule())
     #add multithreading customization
-    hlt.write(getThreadConfiguration)
+    hlt.write(getThreadConfiguration())
     
 
 def getTestPath(t):
@@ -144,5 +145,5 @@ def copyHltMenu(t):
             os.system('mv %s %s' % (new,testpath))
 
 def copyMenusForMultiTest(mt):
-    for test in mt:
+    for test in mt.tests:
         copyHltMenu(test)
