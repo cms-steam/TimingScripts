@@ -2,6 +2,11 @@
 
 #import some needed libraries
 import sys, os
+sys.path.append('../Classes/')
+from test import *
+from helperFunctions import *
+#import configure scripts
+from configureScripts import *
 
 '''types of tests are:
 
@@ -25,6 +30,9 @@ type = raw_input('Choose 1, 2, 3, or 4: ')
 print 'What type of cpu architecture is this for? The currently supported options are: \n 1 - SandyBridge \n 2 - IvyBridge \n 3 - Haswell \n'
 arch = raw_input('Choose 1, 2, or 3: ')
 
+#get number of trials
+tries = int(raw_input('Enter how many trials of the test you would like to run: '))
+
 #get extra naming info for the test
 name = raw_input('Enter any extra naming you would like the test to have (default is \'TYPE_ARCH\'): \n')
 if name != '':
@@ -32,25 +40,33 @@ if name != '':
 
 name = types[type]+'_'+archs[arch]+name
 
-hlt = raw_input('Enter path to base menu to be used for study')
+hlt = raw_input('Enter path to base menu to be used for study: ')
 
 if type=='1':
-    mTest = configureCPUScan(arch,name,hlt)
+    mTest = configureCPUScan(arch,name,hlt,tries)
 elif type=='2':
-    mTest = configureOccScan(arch,name,h;t)
+    mTest = configureOccScan(arch,name,hlt,tries)
 elif type=='3':
-    mTest = configureThreadScan(arch,name,hlt)
+    mTest = configureThreadScan(arch,name,hlt,tries)
 elif type=='4':
-    mTest = configureFreeScan(arch,name,hlt)
+    mTest = configureFreeScan(arch,name,hlt,tries)
 else:
     print 'You did not pick a valid choice for test type! Exiting...'
     sys.exit(0)
 
-#save the test for later
-filename = 'mtest_cfg_%s.txt' %s mTest.name
+#save the test configuration for later
+filename = 'mtest_cfg_%s.txt' % mTest.name
 outfile = open(filename,'w')
 writeMultiTestFile(mTest,outfile)
 outfile.close()
+
+#add needing services and dqm to base menu
+print "Adding FastTimerService, ThroughputService, and DQM outputmodule to base hlt menu..."
+customizeMenuForTiming(hlt)
+
+#make needed copies of menu
+print "Making needed copies of menus"
+copyMenusForMultiTest(mt)
 
 # now run test if desired
 runFile = 'run_'+types[type]+'_'+archs[arch]+name+'.sh'
