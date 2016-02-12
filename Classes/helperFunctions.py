@@ -112,8 +112,10 @@ def customizeMenuForTiming(menu):
     hlt.write(getDQMModule)
     #add multithreading customization
     hlt.write(getThreadConfiguration)
-
     
+
+def getTestPath(t):
+    return './%s' %t.name
 
 def copyHltMenu(t):
     ncores = t.ncores
@@ -123,14 +125,24 @@ def copyHltMenu(t):
 
     cfgString = '_%sj%sc_%st_j' % (njobs,ncores,nthreads) 
 
+    #open base menu
+    base = open(t.baseMenu)
+
     for i in range(1,t.trials+1):
         trialstring = '_trial%i' % i
         for j in range(1,njobs+1):
             hltname = name+'_'+t.name+cfgString+str(j)+trialstring+'.py'
-            base = open(t.baseMenu)
             new = open(hltname)
-            dqmPath = t.name+"/trial%i/%ijobs/j%i/" % (i,njobs,j)
+            dqmPath = "/trial%i/%ijobs/j%i/" % (i,njobs,j)
             for line in base:
                 line = line.replace('NTHREADS',t.nThreads)
                 line = line.replace('DQMOUTPUTPATH',dqmPath)
                 new.write(line)
+            new.close()
+            #move new file to test directory
+            testPath = getTestPath(t)
+            os.system('mv %s %s' % (new,testpath))
+
+def copyMenusForMultiTest(mt):
+    for test in mt:
+        copyHltMenu(test)
