@@ -65,16 +65,25 @@ print "Adding FastTimerService, ThroughputService, and DQM outputmodule to base 
 customizeMenuForTiming(hlt)
 
 #make needed copies of menu
+#make needed directory first
+os.system('mkdir %s' % mTest.name)
 print "Making needed copies of menus"
-copyMenusForMultiTest(mt)
+copyMenusForMultiTest(mTest)
+
+#make directory structure
+setupDirectoriesForMultiTest(mTest)
 
 # now run test if desired
-runFile = 'run_'+types[type]+'_'+archs[arch]+name+'.sh'
-print 'Would you like to start the test now (If not, simply run the following file later: %s)?' % runFile
+runFilename = 'run_'+types[type]+'_'+archs[arch]+name+'.sh'
+runFile = open(runFilename,'w')
+writeRunFile(runFile,mTest)
+runFile.close()
+
+print 'Would you like to start the test now (If not, simply run the following file later: %s)?' % runFilename
 run = raw_input('Enter Y/n: ')
 
 if run=='Y':
-    os.system('nohup sh %s' % runFile)
+#    os.system('nohup sh %s' % runFilename)
     print 'Jobs started. Now exiting...'
 else:
     print 'Exiting...'

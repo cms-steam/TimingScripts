@@ -22,7 +22,39 @@ def writeMultiTestFile(mt,f):
         f.write("\n")
 
 def writeRunLine(core,filename,logname):
-    return "nohup taskset -c %i cmsRun %s >& %s" % (core,filename,logname)
+    if type(core) is list:
+        corestring = ''
+        for i in range(0,len(core)):
+            corestring+='%i' % core[i]
+            if i < len(core)-1:
+                corestring+=','
+        return "nohup taskset -c %s cmsRun %s >& %s" % (corestring,filename,logname)
+    else:
+        return "nohup taskset -c %i cmsRun %s >& %s" % (core,filename,logname)
+
+def writeRunFile(f,mt):
+    f.write('#/usr/bin/bash\n')
+    f.write('#run file for test %s\n\n' %mt.name)
+    #loop over tests
+    for t in mt.tests:
+    #loop over trials in the test
+        for i in range(1,t.trials+1):
+        #loop over jobs in test
+            for j in range(1,1+t.njobs):
+            #make core list
+                cores=[]
+                for c in range(0,t.ncores):
+                    cores.append(c)
+            #find the correct hlt menu
+                name = (t.baseMenu).split('.py')[0]
+                cfgString = '_%sj%sc_%st_j' % (t.njobs,t.ncores,t.nthreads)
+                trialstring = '_trial%i' % i
+                hltname = name+'_'+t.name+cfgString+str(j)+trialstring+'.py'
+                log = "/trial%i/%ijobs/j%i/full.log" % (i,t.nthreads,j)                    
+            #now write run line
+                f.write(writeRunLine(cores,hltname,log))
+            f.write('\n')
+            
 
 def getFastTimerService():
     fts = """
@@ -133,17 +165,31 @@ def copyHltMenu(t):
         trialstring = '_trial%i' % i
         for j in range(1,njobs+1):
             hltname = name+'_'+t.name+cfgString+str(j)+trialstring+'.py'
-            new = open(hltname)
-            dqmPath = "/trial%i/%ijobs/j%i/" % (i,njobs,j)
+            new = open(hltname,'w')
+            dqmPath = "/trial%i/%ijobs/j%i/" % (i,nthreads,j)
             for line in base:
-                line = line.replace('NTHREADS',t.nThreads)
+                line = line.replace('NTHREADS',str(t.nthreads))
                 line = line.replace('DQMOUTPUTPATH',dqmPath)
                 new.write(line)
             new.close()
             #move new file to test directory
             testPath = getTestPath(t)
-            os.system('mv %s %s' % (new,testpath))
+            os.system('mv %s %s/%s' % (hltname,testPath,hltname))
+#            print 'mv %s %s/%s' % (hltname,testPath,hltname)
 
 def copyMenusForMultiTest(mt):
     for test in mt.tests:
         copyHltMenu(test)
+
+def setupDirectory(t):
+    for i in range(1,t.trials+1):
+        if t.name.find('Thread-Scan')==-1:
+            maxjobs = t.njobs
+        else:
+            maxjobs = t.nthreads
+        for j in range(1,maxjobs+1):
+            os.system('mkdir -p %s/trial%i/%ijobs/j%i' % (t.name,i,maxjobs,j))
+
+def setupDirectoriesForMultiTest(mt):
+    for t in mt.tests:
+        setupDirectory(t)
