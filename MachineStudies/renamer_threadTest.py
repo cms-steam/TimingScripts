@@ -20,6 +20,6 @@ mt = readMultiTest(tfile)
 cwd = os.getcwd()
 for t in mt.tests:
     for i in range(1,t.trials+1):
-        basedir=cwd+mt.name+'/trial%i/%ijobs' % (i,t.nthreads)
-        print 'python renamer.py --basedir %s --njobs %i --ncores %i --trial %i --options %s --nthreads %i --run %i' % (basedir,t.njobs,t.ncores,i,t.name,t.nthreads,run)
- #       os.system('python renamer.py --basedir %s --njobs %i --ncores %i --trial %i --options %s --nthreads %i' % (basedir,t.njobs,t.ncores,i,t.name,t.nthreads))
+        basedir=cwd+'/'+mt.name+'/trial%i/%ijobs' % (i,t.nthreads)
+ #       print 'python renamer.py --basedir %s --njobs %i --ncores %i --trial %i --options %s --nthreads %i --run %i' % (basedir,t.njobs,t.ncores,i,t.name,t.nthreads,run)
+        os.system('python renamer.py --basedir %s --njobs %i --ncores %i --trial %i --options %s --nthreads %i --run %i' % (basedir,t.njobs,t.ncores,i,t.name,t.nthreads,run))
