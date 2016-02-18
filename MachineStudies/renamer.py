@@ -12,6 +12,7 @@ parser.add_argument("--ncores",type=int, help='The number of cores for the job',
 parser.add_argument("--trial",type=int,help='The trial for this test, no default value to avoid accidental overwrite',required=True,nargs=1)
 parser.add_argument("--options",type=str,help='The extra info for naming the files based on the conditions of the test (eg. cmssw, pu, etc)',required=False)
 parser.add_argument("--nthreads", type=int, help='The number of total threads',required=True, nargs=1)
+parser.add_argument("--run",type=int,help='Run number of input data. Should be 1 for MC.',required=True,nargs=1)
 #parse the arguments
 args=parser.parse_args()
 
@@ -21,7 +22,7 @@ basedir=args.basedir[0]
 home = os.getcwd()
 #make output directory
 output=home+"/renamer_output/"
-
+os.system('mkdir -p %s' % output)
 os.chdir(basedir)
 print 'now working in',os.getcwd()
 
@@ -35,6 +36,8 @@ for i in range(0,len(names)):
 #get other arguments
 njobs = args.njobs[0]
 ncores = args.ncores[0]
+nthreads = args.nthreads[0]
+run = args.run[0]
 
 #loop to copy and rename files
 for i in range(1,njobs+1):
@@ -44,7 +47,7 @@ for i in range(1,njobs+1):
     newname+='.root'
 
     #copy the file
-    oldname = './j%i/DQM_V0001_R000%i__HLT__FastTimerService__All.root.root' % (i,run)
+    oldname = './j%i/DQM_V0001_R000%i__HLT__FastTimerService__All.root' % (i,run)
     copy = 'cp %s %s' % (oldname,newname)
     print copy
-    # os.system(copy)
+    os.system(copy)
