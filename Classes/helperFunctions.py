@@ -21,16 +21,22 @@ def writeMultiTestFile(mt,f):
         #write blank line to separate test info
         f.write("\n")
 
-def writeRunLine(core,filename,logname):
+def writeRunLineForCPUScan(core,filename,logname,last):
+    if last:
+        return "nohup taskset -c %i cmsRun %s >& %s;\n" % (core-1,filename,logname)
+    else:
+        return "nohup taskset -c %i cmsRun %s >& %s&\n" % (core-1,filename,logname)
+
+def writeRunLineForThreadScan(core,filename,logname):
     if type(core) is list:
         corestring = ''
         for i in range(0,len(core)):
             corestring+='%i' % core[i]
             if i < len(core)-1:
                 corestring+=','
-        return "nohup taskset -c %s cmsRun %s >& %s" % (corestring,filename,logname)
+        return "nohup taskset -c %s cmsRun %s >& %s;\n" % (corestring,filename,logname)
     else:
-        return "nohup taskset -c %i cmsRun %s >& %s" % (core,filename,logname)
+        return "nohup taskset -c %i cmsRun %s >& %s;\n" % (core,filename,logname)
 
 def writeRunFile(f,mt):
     f.write('#/usr/bin/bash\n')
@@ -41,7 +47,12 @@ def writeRunFile(f,mt):
         for i in range(1,t.trials+1):
         #loop over jobs in test
             for j in range(1,1+t.njobs):
-            #make core list
+                #set bool in case this is the last job
+                if j==t.njobs:
+                    last = True
+                else:
+                    last = False
+                #make core list
                 cores=[]
                 for c in range(0,t.ncores):
                     cores.append(c)
@@ -50,9 +61,12 @@ def writeRunFile(f,mt):
                 cfgString = '_%sj%sc_%st_j' % (t.njobs,t.ncores,t.nthreads)
                 trialstring = '_trial%i' % i
                 hltname = name+'_'+t.name+cfgString+str(j)+trialstring+'.py'
-                log = "/trial%i/%ijobs/j%i/full.log" % (i,t.nthreads,j)                    
+                log = "./trial%i/%ijobs/j%i/full.log" % (i,t.njobs,j)                    
             #now write run line
-                f.write(writeRunLine(cores,hltname,log))
+                if (t.name).find('Thread-Scan')!=-1:
+                    f.write(writeRunLineForThreadScan(cores,hltname,log))
+                if (t.name).find('CPU-Scan')!=-1:
+                    f.write(writeRunLineForCPUScan(j,hltname,log,last))
             f.write('\n')
             
 
@@ -150,7 +164,7 @@ def customizeMenuForTiming(menu):
 def getTestPath(t):
     return './%s' %t.name
 
-def copyHltMenu(t):
+def copyHltMenuForCPUScan(t):
     ncores = t.ncores
     njobs = t.njobs
     nthreads = t.nthreads
@@ -158,28 +172,61 @@ def copyHltMenu(t):
 
     cfgString = '_%sj%sc_%st_j' % (njobs,ncores,nthreads) 
 
-    #open base menu
-    base = open(t.baseMenu)
 
     for i in range(1,t.trials+1):
         trialstring = '_trial%i' % i
         for j in range(1,njobs+1):
             hltname = name+'_'+t.name+cfgString+str(j)+trialstring+'.py'
             new = open(hltname,'w')
-            dqmPath = "/trial%i/%ijobs/j%i/" % (i,nthreads,j)
+            dqmPath = "./trial%i/%ijobs/j%i/" % (i,njobs,j)
+            #open base menu
+            base = open(t.baseMenu)
             for line in base:
                 line = line.replace('NTHREADS',str(t.nthreads))
                 line = line.replace('DQMOUTPUTPATH',dqmPath)
                 new.write(line)
             new.close()
+            base.close()
+            #move new file to test directory
+            testPath = getTestPath(t)
+            os.system('mv %s %s/%s' % (hltname,testPath,hltname))
+
+
+def copyHltMenuForThreadTest(t):
+    ncores = t.ncores
+    njobs = t.njobs
+    nthreads = t.nthreads
+    name = (t.baseMenu).split('.py')[0]
+
+    cfgString = '_%sj%sc_%st_j' % (njobs,ncores,nthreads) 
+
+
+    for i in range(1,t.trials+1):
+        trialstring = '_trial%i' % i
+        for j in range(1,njobs+1):
+            hltname = name+'_'+t.name+cfgString+str(j)+trialstring+'.py'
+            new = open(hltname,'w')
+            dqmPath = "./trial%i/%ithreadss/j%i/" % (i,nthreads,j)
+            #open base menu
+            base = open(t.baseMenu)
+            for line in base:
+                line = line.replace('NTHREADS',str(t.nthreads))
+                line = line.replace('DQMOUTPUTPATH',dqmPath)
+                new.write(line)
+            new.close()
+            base.close()
             #move new file to test directory
             testPath = getTestPath(t)
             os.system('mv %s %s/%s' % (hltname,testPath,hltname))
 #            print 'mv %s %s/%s' % (hltname,testPath,hltname)
 
 def copyMenusForMultiTest(mt):
-    for test in mt.tests:
-        copyHltMenu(test)
+    for t in mt.tests:
+        if (t.name).find('Thread-Scan')!=-1:
+            copyHltMenuForThreadTest(t)
+        elif (t.name).find('CPU-Scan')!=-1:
+            copyHltMenuForCPUScan(t)
+
 
 def setupDirectory(t):
     for i in range(1,t.trials+1):
