@@ -79,7 +79,7 @@ for h in pathHistos:
 
 evGraph.SetMarkerColor(1)
 evGraph.SetMarkerStyle(22)
-evGraph.GetYaxis().SetRangeUser(0,120)
+evGraph.GetYaxis().SetRangeUser(0,evGraph.GetMaximum())
 evGraph.SetTitle("Timing vs. N_{threads} (1 job)")
 evGraph.GetYaxis().SetTitle("Processing Time (ms)")
 evGraph.GetXaxis().SetTitle("N_{threads}")
@@ -110,7 +110,7 @@ for i in range(0,len(threads)):
 
 thruGraph.SetMarkerColor(1)
 thruGraph.SetMarkerStyle(22)
-thruGraph.GetYaxis().SetRangeUser(0,200)
+thruGraph.GetYaxis().SetRangeUser(0,thruGraph.GetMaximum())
 thruGraph.GetYaxis().SetTitle(" < N_events> / 10s / thread")
 thruGraph.GetXaxis().SetTitle(" N_{threads}")
 thruGraph.SetTitle("Average Job Throughput per Thread")
