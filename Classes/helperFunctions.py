@@ -179,11 +179,13 @@ def copyHltMenuForCPUScan(t):
             hltname = name+'_'+t.name+cfgString+str(j)+trialstring+'.py'
             new = open(hltname,'w')
             dqmPath = "./trial%i/%ijobs/j%i/" % (i,njobs,j)
+            dqmio = "DQMIO_%i.root" % j
             #open base menu
             base = open(t.baseMenu)
             for line in base:
                 line = line.replace('NTHREADS',str(t.nthreads))
                 line = line.replace('DQMOUTPUTPATH',dqmPath)
+                line = line.replace('DQMIO.root',dqmio)
                 new.write(line)
             new.close()
             base.close()
@@ -207,7 +209,7 @@ def copyHltMenuForThreadTest(t):
             hltname = name+'_'+t.name+cfgString+str(j)+trialstring+'.py'
             new = open(hltname,'w')
             dqmPath = "./trial%i/%ithreadss/j%i/" % (i,nthreads,j)
-            dqmio = "DQMIO_%i%.root" % j
+            dqmio = "DQMIO_%i.root" % j
             #open base menu
             base = open(t.baseMenu)
             for line in base:
