@@ -67,7 +67,7 @@ def writeRunFile(f,mt):
                     f.write(writeRunLineForThreadScan(cores,hltname,log))
                 if (t.name).find('CPU-Scan')!=-1:
                     f.write(writeRunLineForCPUScan(j,hltname,log,last))
-            f.write('\n')
+            f.write('wait $(jobs -p)\n\n')
             
 
 def getFastTimerService():
