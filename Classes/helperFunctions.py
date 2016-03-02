@@ -92,14 +92,14 @@ process.FastTimerService = cms.Service( "FastTimerService",
     enableTimingSummary = cms.untracked.bool( True ),
     enableDQMbyPathTotal = cms.untracked.bool( True ),
     enableTimingPaths = cms.untracked.bool( True ),
-    enableDQMbyPathExclusive = cms.untracked.bool( False ),
+    enableDQMbyPathExclusive = cms.untracked.bool( True ),
     dqmTimeResolution = cms.untracked.double( 5.0 ),
     dqmModuleTimeResolution = cms.untracked.double( 0.2 ),
-    enableDQMbyPathActive = cms.untracked.bool( False ),
-    enableDQMbyPathDetails = cms.untracked.bool( False ),
+    enableDQMbyPathActive = cms.untracked.bool( True ),
+    enableDQMbyPathDetails = cms.untracked.bool( True ),
     enableDQMbyPathOverhead = cms.untracked.bool( False ),
     enableDQMbyPathCounters = cms.untracked.bool( True ),
-    enableDQMbyModuleType = cms.untracked.bool( False )
+    enableDQMbyModuleType = cms.untracked.bool( True )
 )
 """
     return fts
