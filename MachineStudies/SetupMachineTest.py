@@ -12,19 +12,18 @@ from configureScripts import *
 
 1) CPU Scan, starts with 1 job and fills the machine 1 job at a time
 
-2) Occupancy Scan, an abbreviated version of above, which does only a few selected points.
+2) Custom Scan - Add tests by hand with whatever settings you please (can be used for PU test)
 
 3) Thread Scan, starts with one job and 1 one thread, then increases number of threads for that job until full cpu is reached.
 
-4) Free Scan, set the number of threads, the ratio of jobs to cores, starting, and stopping number of jobs
-
 '''
+#4) Free Scan, set the number of threads, the ratio of jobs to cores, starting, and stopping number of jobs
 #define dictionary for types of scans
-types = {'1':'CPU-Scan','2':'Occ-Scan','3':'Thread-Scan'}
+types = {'1':'CPU-Scan','2':'Custom-Scan','3':'Thread-Scan'}
 #define dicionary for architectures the script will know how to handle
 archs = {'1':'SandyBridge','2':'IvyBridge','3':'Haswell','4':'Broadwell'}
 
-print 'Please pick a type of test to run. The currently supported options are: \n 1 - CPU-Scan \n 2 - Occupancy Scan \n 3 - Multithreading Scan \n 4 - Free Scan \n'
+print 'Please pick a type of test to run. The currently supported options are: \n 1 - CPU-Scan \n 2 - Custom Scan \n 3 - Multithreading Scan \n 4 - Free Scan \n'
 type = raw_input('Choose 1, 2, 3, or 4: ')
 
 print 'What type of cpu architecture is this for? The currently supported options are: \n 1 - SandyBridge \n 2 - IvyBridge \n 3 - Haswell \n'
@@ -40,16 +39,19 @@ if name != '':
 
 name = types[type]+'_'+archs[arch]+name
 
-hlt = raw_input('Enter path to base menu to be used for study: ')
+if type!='2':
+    hlt = raw_input('Enter path to base menu to be used for study: ')
+else:
+    hlt=''
 
 if type=='1':
     mTest = configureCPUScan(arch,name,hlt,tries)
 elif type=='2':
-    mTest = configureOccScan(arch,name,hlt,tries)
+    mTest = configureCustomScan(arch,name,hlt,tries)
 elif type=='3':
     mTest = configureThreadScan(arch,name,hlt,tries)
-elif type=='4':
-    mTest = configureFreeScan(arch,name,hlt,tries)
+#elif type=='4':
+#    mTest = configureFreeScan(arch,name,hlt,tries)
 else:
     print 'You did not pick a valid choice for test type! Exiting...'
     sys.exit(0)
@@ -61,8 +63,9 @@ writeMultiTestFile(mTest,outfile)
 outfile.close()
 
 #add needing services and dqm to base menu
-print "Adding FastTimerService, ThroughputService, and DQM outputmodule to base hlt menu..."
-customizeMenuForTiming(hlt)
+if type !='2':
+    print "Adding FastTimerService, ThroughputService, and DQM outputmodule to base hlt menu..."
+    customizeMenuForTiming(hlt)
 
 #make needed copies of menu
 #make needed directory first

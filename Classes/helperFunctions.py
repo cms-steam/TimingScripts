@@ -38,6 +38,20 @@ def writeRunLineForThreadScan(core,filename,logname):
     else:
         return "nohup taskset -c %i cmsRun %s >& %s;\n" % (core,filename,logname)
 
+def writeRunLineForCustomScan(core,filename,logname,last):
+    if type(core) is list:       
+        corestring = ''
+        for i in range(0,len(core)):
+            corestring+='%i' % core[i]
+            if i < len(core)-1:
+                corestring+=','
+        if(last):
+            return "nohup taskset -c %s cmsRun %s >& %s;\n" % (corestring,filename,logname)
+        else:
+            return "nohup taskset -c %s cmsRun %s >& %s&\n" % (corestring,filename,logname)
+    else:
+        return "nohup taskset -c %i cmsRun %s >& %s;\n" % (core,filename,logname)
+
 def writeRunFile(f,mt):
     f.write('#/usr/bin/bash\n')
     f.write('#run file for test %s\n\n' %mt.name)
@@ -61,12 +75,15 @@ def writeRunFile(f,mt):
                 cfgString = '_%sj%sc_%st_j' % (t.njobs,t.ncores,t.nthreads)
                 trialstring = '_trial%i' % i
                 hltname = name+'_'+t.name+cfgString+str(j)+trialstring+'.py'
-                log = "./trial%i/%ijobs/j%i/full.log" % (i,t.njobs,j)                    
+                log = "./trial%i/%ijobs_%ithreads/j%i/full.log" % (i,t.njobs,t.nthreads,j) 
             #now write run line
                 if (t.name).find('Thread-Scan')!=-1:
                     f.write(writeRunLineForThreadScan(cores,hltname,log))
                 if (t.name).find('CPU-Scan')!=-1:
                     f.write(writeRunLineForCPUScan(j,hltname,log,last))
+                if (t.name).find('Custom-Scan')!=-1:
+                    f.write(writeRunLineForCustomScan(cores,hltname,log,last))
+
             f.write('wait $(jobs -p)\n\n')
             
 
@@ -178,7 +195,37 @@ def copyHltMenuForCPUScan(t):
         for j in range(1,njobs+1):
             hltname = name+'_'+t.name+cfgString+str(j)+trialstring+'.py'
             new = open(hltname,'w')
-            dqmPath = "./trial%i/%ijobs/j%i/" % (i,njobs,j)
+            dqmPath = "./trial%i/%ijobs_%ithreads/j%i/" % (i,njobs,nthreads,j)
+            dqmio = "DQMIO_%i.root" % j
+            #open base menu
+            base = open(t.baseMenu)
+            for line in base:
+                line = line.replace('NTHREADS',str(t.nthreads))
+                line = line.replace('DQMOUTPUTPATH',dqmPath)
+                line = line.replace('DQMIO.root',dqmio)
+                new.write(line)
+            new.close()
+            base.close()
+            #move new file to test directory
+            testPath = getTestPath(t)
+            os.system('mv %s %s/%s' % (hltname,testPath,hltname))
+
+
+def copyHltMenuForCustomScan(t):
+    ncores = t.ncores
+    njobs = t.njobs
+    nthreads = t.nthreads
+    name = (t.baseMenu).split('.py')[0]
+
+    cfgString = '_%sj%sc_%st_j' % (njobs,ncores,nthreads) 
+
+
+    for i in range(1,t.trials+1):
+        trialstring = '_trial%i' % i
+        for j in range(1,njobs+1):
+            hltname = name+'_'+t.name+cfgString+str(j)+trialstring+'.py'
+            new = open(hltname,'w')
+            dqmPath = "./trial%i/%ijobs_%ithreads/j%i/" % (i,njobs,nthreads,j)
             dqmio = "DQMIO_%i.root" % j
             #open base menu
             base = open(t.baseMenu)
@@ -208,7 +255,7 @@ def copyHltMenuForThreadTest(t):
         for j in range(1,njobs+1):
             hltname = name+'_'+t.name+cfgString+str(j)+trialstring+'.py'
             new = open(hltname,'w')
-            dqmPath = "./trial%i/%ithreadss/j%i/" % (i,nthreads,j)
+            dqmPath = "./trial%i/%ijobs_%ithreads/j%i/" % (i,njobs,nthreads,j)
             dqmio = "DQMIO_%i.root" % j
             #open base menu
             base = open(t.baseMenu)
@@ -230,7 +277,8 @@ def copyMenusForMultiTest(mt):
             copyHltMenuForThreadTest(t)
         elif (t.name).find('CPU-Scan')!=-1:
             copyHltMenuForCPUScan(t)
-
+        elif (t.name).find('Custom-Scan')!=-1:
+            copyHltMenuForCustomScan(t)
 
 def setupDirectory(t):
     for i in range(1,t.trials+1):
@@ -239,7 +287,7 @@ def setupDirectory(t):
         else:
             maxjobs = t.nthreads
         for j in range(1,maxjobs+1):
-            os.system('mkdir -p %s/trial%i/%ijobs/j%i' % (t.name,i,maxjobs,j))
+            os.system('mkdir -p %s/trial%i/%ijobs_%ithreads/j%i' % (t.name,i,maxjobs,t.nthreads,j))
 
 def setupDirectoriesForMultiTest(mt):
     for t in mt.tests:

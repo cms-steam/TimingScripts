@@ -3,6 +3,33 @@
 import sys, os
 sys.path.append('../Classes/')
 from test import *
+from helperFunctions import * 
+
+def configureCustomScan(arch,name,hlt,trials):
+ 
+    cpus = {'1':'SandyBridge','2':'IvyBridge','3':'Haswell'}
+
+    maxjobs = {'1':32,'2':32,'3':48}
+
+    print 'Configuring Custom Scan for %s machine, which has max number of threads %i.' % (cpus[arch],maxjobs[arch])
+
+    print 'Enter parameters for new test in following format: njobs,ncores,nthreads,baseHLT. When you are finished adding tests type \'Done\''
+    mt = multiTest(name)
+
+    while(1):
+        params = raw_input('Test parameters, \'Done\' for finished: ')
+        if params=='Done':
+            return mt
+        else:
+            njobs = int(params.split(',')[0])
+            ncores = int(params.split(',')[1])
+            nthreads = int(params.split(',')[2])
+            hlt = params.split(',')[3]
+            current = test(njobs,ncores,nthreads,name,hlt,trials)
+        #add the timing parameters now
+            customizeMenuForTiming(hlt)
+            mt.tests.append(current)
+    
 
 def configureCPUScan(arch,name,hlt,trials):
  
