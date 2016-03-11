@@ -20,6 +20,12 @@ currentTest = test(nj,nc,nt,name,menu,trials)
 #report back to user so that they know what's going on
 print "You have configured the test as follows: "
 print test
+
+print "making copy of menu and customizing for timing info"
+newhltname = menu.split('.py')[0]+'_'+name+'.py'
+os.system('cp %s %s' %(menu,newhltname)
+customizeMenuForTiming(newhltname)
+
 #save the test configuration
 savefile = "test_cfg_%s.txt" % currentTest.name
 print "Saving as %s" % savefile
