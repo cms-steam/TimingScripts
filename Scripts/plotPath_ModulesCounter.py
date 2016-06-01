@@ -113,7 +113,7 @@ def plotInputComparison(files,runs,processes,path):
             Thists[k].SetLineColor(k+1)
             Thists[k].Draw("same")
         #write name in full
-        name = files[k]
+        name = "Mean: %f" % Thists[k].GetMean()
         if args.ext:
             Thists[k].GetXaxis().SetRangeUser(0,2000)
         else:
