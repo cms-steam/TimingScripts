@@ -11,17 +11,26 @@ runs = [274998,274956,274958,274959,274968,274969,274971,274443,274442,274441,27
 #    f.write("{\"%i\":[[]]}\n")
 #    f.close
 
+#make needed directory structure
+
+if not os.path.isdir("./event_rootFiles"):
+    os.system("mkdir event_rootFiles")
+if not os.path.isdir("./timeByLs_rootFiles"):
+    os.system("mkdir timeByLs_rootFiles")
+if not os.path.isdir("./lumi_rootFiles"):
+    os.system("mkdir lumi_rootFiles")
+
+
 for run in runs:
-    #cd to event directory
-    os.chdir('/afs/cern.ch/user/c/clint/Work/TimingValidation/DQMOnline/CMSSW_8_0_10_patch2/src/event_rootFiles')
+    os.chdir('event_rootFiles')
     command ="python ../dqm-acces.py -s https://cmsweb.cern.ch/dqm/online/data/json -f \"/HLT/TimerService/*/event\" -e \"run == %i and match(\'/Global/Online/ALL\', dataset)\" -r -w" % run
     os.system(command)
     #cd to timing by ls
-    os.chdir('/afs/cern.ch/user/c/clint/Work/TimingValidation/DQMOnline/CMSSW_8_0_10_patch2/src/timeByLs_rootFiles')
+    os.chdir('../timeByLs_rootFiles')
     command ="python ../dqm-acces.py -s https://cmsweb.cern.ch/dqm/online/data/json -f \"/HLT/TimerService/*/event_byls\" -e \"run == %i and match(\'/Global/Online/ALL\', dataset)\" -r -w" % run
     os.system(command)
     #cd to lumi directory
-    os.chdir('/afs/cern.ch/user/c/clint/Work/TimingValidation/DQMOnline/CMSSW_8_0_10_patch2/src/lumi_rootFiles')
+    os.chdir('../lumi_rootFiles')
     command ="python ../dqm-acces.py -s https://cmsweb.cern.ch/dqm/online/data/json -f \"/Scal/LumiScalers/Instant_Lumi\" -e \"run == %i and match(\'/Global/Online/ALL\', dataset)\" -r -w" % run
     os.system(command)
-
+    os.chdir('..')
