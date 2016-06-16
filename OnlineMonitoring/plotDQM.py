@@ -2,8 +2,7 @@
 
 import os
 from ROOT import *
-
-runs = [274998,274956,274958,274959,274968,274969,274971,274443,274442,274441,274440,274422,274421,274420,274388,274387,274345,274344,274338,274335,274319,274316,274315,274314,274286,274284,274282]
+runs = [275125,275124,275074,275073,275068,275067,275066,275059,275001,275000,274999,274998,274971,274969,274968,274959,274958,274956,274443,274442,274441,274440,274422,274421,274420,274388,274387,274345,274344,274338,274335,274319,274316,274315,274314,274286,274284,274282]
 timingFiles = []
 timeByLsFiles = []
 lumiFiles = []
@@ -37,6 +36,27 @@ for f in lumiFiles:
     hist = f.Get("/Scal/LumiScalers/Instant_Lumi")
     lumiHists.append(hist)
 
+
+#now define for fills
+runs5021= runs[0:2]
+tbls5021=timingByLsHists[0:2]
+lumi5021=lumiHists[0:2]
+
+runs5020= runs[2:8]
+tbls5020=timingByLsHists[2:8]
+lumi5020=lumiHists[2:8]
+
+runs5017= runs[8:12]
+tbls5017=timingByLsHists[8:12]
+lumi5017=lumiHists[8:12]
+
+runs5013= runs[12:15]
+tbls5013=timingByLsHists[12:15]
+lumi5013=lumiHists[12:15]
+
+runs5005= runs[15:18]
+tbls5005=timingByLsHists[15:18]
+lumi5005=lumiHists[15:18]
 
 def plotTiming(hists):
     c1=TCanvas()
@@ -186,11 +206,69 @@ def plotTimingVLumi(tHist,lHist,run):
 
 #    g.SetMarkerStyle(22)
     g.SetTitle("Processing Time vs. Luminosity")
-    g.GetXaxis().SetTitle("Instantaneous Luminosity (e33 cm^{-2})")
+    g.GetXaxis().SetTitle("Instantaneous Luminosity (e30 cm^{-2})")
     g.GetYaxis().SetTitle("Processing time (ms)")
     g.Draw("ap")
     pdfname = "Timing_v_Lumi_Run%s.pdf" %run
     c1.Print(pdfname)
+
+def plotTimingVLumiAll(tHists,lHists,runs):
+
+    c1 = TCanvas()
+    if len(runs)>5:
+        leg = TLegend(0.1,0.3,0.5,0.9)
+    else:
+        leg = TLegend(0.1,0.6,0.5,0.9)
+    leg.SetFillStyle(0)
+    leg.SetBorderSize(0)
+    it=0
+    graphs =[]
+    for run in runs:
+        g = getGraph(tHists[it],lHists[it])
+        #add a dummy point to make plotting axis range possible
+        g.SetPoint(g.GetN(),10000,2000)
+        g.GetXaxis().SetRangeUser(0,10000)
+        g.GetYaxis().SetRangeUser(0,250)
+        g.SetMarkerColor(it+1)
+        g.SetFillColor(it+1)
+        graphs.append(g)
+        it+=1
+
+    it=0
+    for graph in graphs:
+        graph.SetTitle("Processing Time vs. Luminosity")
+        graph.GetXaxis().SetTitle("Instantaneous Luminosity (e30 cm^{-2})")
+        graph.GetYaxis().SetTitle("Processing time (ms)")
+
+        leg.AddEntry(graph,"Run: %s" % runs[it],"f")
+        if it ==0:
+            graph.Draw("ap")
+        else:
+            graph.Draw("psame")
+        it+=1
+    
+    leg.Draw("same")
+    c1.Print("Timing_vLumi_Runs%s-%s.pdf" % (runs[0],runs[len(runs)-1]))
+
+def getGraph(tHist,lHist):
+    times = []
+    lumis = []
+    npoints=0
+    for i in range(0,tHist.GetNbinsX()):
+        if (tHist.GetBinContent(i+1)>0 or i<20):
+           
+            times.append(tHist.GetBinContent(i+1))
+            lumis.append(lHist.GetBinContent(i+1))
+            npoints+=1
+    g = TGraph(npoints)
+    for i in range(0,npoints):
+        g.SetPoint(i,lumis[i],times[i])
+
+#    g.SetMarkerStyle(22)
+    g.SetTitle("Processing Time vs. Luminosity")
+    g.GetXaxis().SetTitle("Instantaneous Luminosity (e30 cm^{-2})")
+    g.GetYaxis().SetTitle("Processing time (ms)")
+    return g
 
 plotTiming(timingHists)
 plotLogTiming(timingHists)
@@ -201,3 +279,10 @@ it=0
 for run in runs:
     plotTimingVLumi(timingByLsHists[it],lumiHists[it],run)
     it+=1
+
+plotTimingVLumiAll(timingByLsHists,lumiHists,runs)
+plotTimingVLumiAll(tbls5021,lumi5021,runs5021)
+plotTimingVLumiAll(tbls5020,lumi5020,runs5020)
+plotTimingVLumiAll(tbls5017,lumi5017,runs5017)
+plotTimingVLumiAll(tbls5013,lumi5013,runs5013)
+plotTimingVLumiAll(tbls5005,lumi5005,runs5005)
