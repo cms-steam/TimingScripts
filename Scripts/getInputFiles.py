@@ -14,7 +14,7 @@ process.source = cms.Source("PoolSource",
                             inputCommands=cms.untracked.vstring(
         "drop *",
         "keep *_TriggerResults_*_HLT",
-        "keep *_hltL1GtObjectMap_*_*",
+        "keep *_hltGtStage2ObjectMap_*_*",
         "keep *_hltTriggerSummaryAOD_*_HLT",
         "keep *_rawDataCollector_*_*"
         )
@@ -25,9 +25,9 @@ process.out = cms.OutputModule("PoolOutputModule",
                                outputCommands = cms.untracked.vstring(
         "drop *",
         "keep *_TriggerResults_*_HLT",
-        "keep *_hltL1GtObjectMap_*_*",
+        "keep *_hltGtStage2ObjectMap_*_*",
         "keep *_hltTriggerSummaryAOD_*_HLT",
-        "keep *_rawDataCollector_*_*"
+        "keep *_rawDataCollector_*_*",
 ));
 
 process.myEndPath = cms.EndPath(process.out)
