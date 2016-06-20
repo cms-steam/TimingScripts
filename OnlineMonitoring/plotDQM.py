@@ -2,10 +2,14 @@
 
 import os
 from ROOT import *
-runs = [275125,275124,275074,275073,275068,275067,275066,275059,275001,275000,274999,274998,274971,274969,274968,274959,274958,274956,274443,274442,274441,274440,274422,274421,274420,274388,274387,274345,274344,274338,274335,274319,274316,274315,274314,274286,274284,274282]
+#runs = [275125,275124,275074,275073,275068,275067,275066,275059,275001,275000,274999,274998,274971,274969,274968,274959,274958,274956,274443,274442,274441,274440,274422,274421,274420,274388,274387,274345,274344,274338,274335,274319,274316,274315,274314,274286,274284,274282,275282,275283,275284,275286,275290,275291,275292,275293]
+runs=[274282, 274284, 274286, 274314, 274315, 274316, 274319, 274335, 274338, 274344, 274345, 274387, 274388, 274420, 274421, 274422, 274440, 274441, 274442, 274443, 274956, 274958, 274959, 274968, 274969, 274971, 274998, 274999, 275000, 275001, 275059, 275066, 275067, 275068, 275073, 275074, 275124, 275125, 275282,275283,275284,275286,275290,275291,275292,275293,275309,275310,275311,275319,275326,275337,275338,275344,275345,275370,275371,275375]
+thruRuns=[275319,275326,275337,275338,275344,275345,275370,275371,275375]
+
 timingFiles = []
 timeByLsFiles = []
 lumiFiles = []
+thrufiles = []
 for run in runs:
     fname = "event_rootFiles/Global__Online__ALL__run%i.root" %run
     timingFiles.append(TFile(fname))
@@ -17,6 +21,10 @@ for run in runs:
 for run in runs:
     fname = "lumi_rootFiles/Global__Online__ALL__run%i.root" %run
     lumiFiles.append(TFile(fname))
+
+for run in thruRuns:
+    fname = "throughput_rootFiles/Global__Online__ALL__run%i.root" %run
+    thruFiles.append(TFile(fname))
 
 timingHists = []
 
@@ -36,27 +44,61 @@ for f in lumiFiles:
     hist = f.Get("/Scal/LumiScalers/Instant_Lumi")
     lumiHists.append(hist)
 
+thruHists = []
+
+for f in thruFiles:
+    hist = f.Get("/HLT/Throughput/throughput_retired")
+    thruHists.append(hist)
+
 
 #now define for fills
-runs5021= runs[0:2]
-tbls5021=timingByLsHists[0:2]
-lumi5021=lumiHists[0:2]
+runs5030= runs[56:57]
+tbls5030=timingByLsHists[56:57]
+lumi5030=lumiHists[56:57]
+thru5030=thruHists[8:9]
 
-runs5020= runs[2:8]
-tbls5020=timingByLsHists[2:8]
-lumi5020=lumiHists[2:8]
+runs5029= runs[54:56]
+tbls5029=timingByLsHists[54:56]
+lumi5029=lumiHists[54:56]
+thru5029=thruHists[6:8]
 
-runs5017= runs[8:12]
-tbls5017=timingByLsHists[8:12]
-lumi5017=lumiHists[8:12]
+runs5028= runs[52:54]
+tbls5028=timingByLsHists[52:54]
+lumi5028=lumiHists[52:54]
+thru5028=thruHists[4:6]
 
-runs5013= runs[12:15]
-tbls5013=timingByLsHists[12:15]
-lumi5013=lumiHists[12:15]
+runs5027= runs[48:52]
+tbls5027=timingByLsHists[48:52]
+lumi5027=lumiHists[48:52]
+thru5027=thruHists[0:4]
 
-runs5005= runs[15:18]
-tbls5005=timingByLsHists[15:18]
-lumi5005=lumiHists[15:18]
+runs5026= runs[45:48]
+tbls5026=timingByLsHists[45:48]
+lumi5026=lumiHists[45:48]
+
+runs5024= runs[38:45]
+tbls5024=timingByLsHists[38:45]
+lumi5024=lumiHists[38:45]
+
+runs5021= runs[36:38]
+tbls5021=timingByLsHists[36:38]
+lumi5021=lumiHists[36:38]
+
+runs5020= runs[30:36]
+tbls5020=timingByLsHists[30:36]
+lumi5020=lumiHists[30:36]
+
+runs5017= runs[26:30]
+tbls5017=timingByLsHists[26:30]
+lumi5017=lumiHists[26:30]
+
+runs5013= runs[23:26]
+tbls5013=timingByLsHists[23:26]
+lumi5013=lumiHists[23:26]
+
+runs5005= runs[20:23]
+tbls5005=timingByLsHists[20:23]
+lumi5005=lumiHists[20:23]
 
 def plotTiming(hists):
     c1=TCanvas()
@@ -77,7 +119,7 @@ def plotTiming(hists):
         else:
             h.Draw("same")
         overflow = h.GetBinContent(201)
-        print "overflow is: %.3f" % overflow
+        #print "overflow is: %.3f" % overflow
         name="Run: %i; Mean: %.1f; Overflow: %.3f" % (runs[it-1], h.GetMean(),overflow)
         leg.AddEntry(h,name,"l")
 
@@ -106,7 +148,7 @@ def plotLogTiming(hists):
         else:
             h.Draw("same")
         overflow = h.GetBinContent(201)
-        print "overflow is: %.3f" % overflow
+        #print "overflow is: %.3f" % overflow
         name="Run: %i; Mean: %.1f; Overflow: %.3f" % (runs[it-1], h.GetMean(),overflow)
         leg.AddEntry(h,name,"l")
 
@@ -228,7 +270,7 @@ def plotTimingVLumiAll(tHists,lHists,runs):
         #add a dummy point to make plotting axis range possible
         g.SetPoint(g.GetN(),10000,2000)
         g.GetXaxis().SetRangeUser(0,10000)
-        g.GetYaxis().SetRangeUser(0,250)
+        g.GetYaxis().SetRangeUser(0,300)
         g.SetMarkerColor(it+1)
         g.SetFillColor(it+1)
         graphs.append(g)
@@ -281,6 +323,7 @@ for run in runs:
     it+=1
 
 plotTimingVLumiAll(timingByLsHists,lumiHists,runs)
+plotTimingVLumiAll(tbls5024,lumi5024,runs5024)
 plotTimingVLumiAll(tbls5021,lumi5021,runs5021)
 plotTimingVLumiAll(tbls5020,lumi5020,runs5020)
 plotTimingVLumiAll(tbls5017,lumi5017,runs5017)
