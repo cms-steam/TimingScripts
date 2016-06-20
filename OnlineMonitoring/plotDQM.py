@@ -9,7 +9,7 @@ thruRuns=[275319,275326,275337,275338,275344,275345,275370,275371,275375]
 timingFiles = []
 timeByLsFiles = []
 lumiFiles = []
-thrufiles = []
+thruFiles = []
 for run in runs:
     fname = "event_rootFiles/Global__Online__ALL__run%i.root" %run
     timingFiles.append(TFile(fname))
@@ -50,31 +50,31 @@ for f in thruFiles:
     hist = f.Get("/HLT/Throughput/throughput_retired")
     thruHists.append(hist)
 
-
+print len(runs)
 #now define for fills
-runs5030= runs[56:57]
-tbls5030=timingByLsHists[56:57]
-lumi5030=lumiHists[56:57]
+runs5030= runs[57:58]
+tbls5030=timingByLsHists[57:58]
+lumi5030=lumiHists[57:58]
 thru5030=thruHists[8:9]
 
-runs5029= runs[54:56]
-tbls5029=timingByLsHists[54:56]
-lumi5029=lumiHists[54:56]
+runs5029= runs[55:57]
+tbls5029=timingByLsHists[55:57]
+lumi5029=lumiHists[55:57]
 thru5029=thruHists[6:8]
 
-runs5028= runs[52:54]
-tbls5028=timingByLsHists[52:54]
-lumi5028=lumiHists[52:54]
+runs5028= runs[53:55]
+tbls5028=timingByLsHists[53:55]
+lumi5028=lumiHists[53:55]
 thru5028=thruHists[4:6]
 
-runs5027= runs[48:52]
-tbls5027=timingByLsHists[48:52]
-lumi5027=lumiHists[48:52]
+runs5027= runs[49:53]
+tbls5027=timingByLsHists[49:53]
+lumi5027=lumiHists[49:53]
 thru5027=thruHists[0:4]
 
-runs5026= runs[45:48]
-tbls5026=timingByLsHists[45:48]
-lumi5026=lumiHists[45:48]
+runs5026= runs[45:49]
+tbls5026=timingByLsHists[45:49]
+lumi5026=lumiHists[45:49]
 
 runs5024= runs[38:45]
 tbls5024=timingByLsHists[38:45]
@@ -312,6 +312,120 @@ def getGraph(tHist,lHist):
     g.GetYaxis().SetTitle("Processing time (ms)")
     return g
 
+def getThruGraph(tHist,lHist):
+    times = []
+    lumis = []
+    npoints=0
+    for i in range(0,lHist.GetNbinsX()):
+        #skip above 1200 ls - where throughput service won't work
+        if(i>1199):
+            continue
+        if (tHist.GetBinContent(i+1)>0 or i<20):
+            j=(i+1)*7
+            k=(i+1)*3
+            times.append(tHist.GetBinContent(j) + tHist.GetBinContent(j-1)+ tHist.GetBinContent(j-2)+ tHist.GetBinContent(j-3)+ tHist.GetBinContent(j-4)+ tHist.GetBinContent(j-5)+ tHist.GetBinContent(j-6))
+            lumis.append( ( lHist.GetBinContent(k) + lHist.GetBinContent(k-1) + lHist.GetBinContent(k-2)) /3)
+            npoints+=1
+            #print "lumi section: %i throughput: %.2f" % (i, tHist.GetBinContent(j)+tHist.GetBinContent(j-1))
+    g = TGraph(npoints)
+    for i in range(0,npoints):
+        g.SetPoint(i,lumis[i],times[i])
+
+#    g.SetMarkerStyle(22)
+#    g.SetTitle("Processing Time vs. Luminosity")
+#    g.GetXaxis().SetTitle("Instantaneous Luminosity (e30 cm^{-2})")
+#    g.GetYaxis().SetTitle("Processing time (ms)")
+    return g
+
+
+def plotThroughputANDTiming(thruHist,timeHist,run):
+    c = TCanvas()
+    p1 = TPad()
+    p2 = TPad()
+    p2.SetFillStyle(40000)
+    p1.Draw()
+    p1.cd()
+    leg = TLegend(0.5,0.6,0.9,0.9)
+    leg.SetFillStyle(0)
+    leg.SetBorderSize(0)
+
+    timeHist.SetMarkerStyle(22)
+    timeHist.SetMarkerColor(kBlue)
+    timeHist.GetXaxis().SetRangeUser(0,700)
+    thruHist.SetMarkerStyle(33)
+    thruHist.SetMarkerColor(kRed)
+
+    leg.AddEntry(timeHist,"Processing Time","p")
+    leg.AddEntry(thruHist,"Throughput","p")
+
+    timeHist.Draw()
+    leg.Draw("same")
+    p1.Update()
+    c.cd()
+
+    #set range for pad 2
+    ymin =0
+    ymax = 2500000
+    dy = (ymax-ymin)/0.8
+    xmin = 0
+    xmax = 16800
+    dx = (xmax-xmin)/0.8
+    p2.Range(xmin-0.1*dx,ymin-0.1*dy,xmax+0.1*dx,ymax+0.1*dy)
+    p2.Draw()
+    p2.cd()
+    thruHist.GetXaxis().SetRangeUser(0,16800)
+    thruHist.Draw("][psames")
+    p2.Update()
+    raxis = TGaxis(xmax,ymin,xmax,ymax,ymin,ymax,50510,"+L")
+    raxis.SetLabelColor(kRed)
+    raxis.Draw()
+
+    pdfname = "ThroughputAndTiming_Run%s.pdf" % run
+    c.Print(pdfname)
+
+def plotThroughputVLumi(thruHists,lHists,runs):
+
+    c1 = TCanvas()
+    if len(runs)>5:
+        leg = TLegend(0.1,0.3,0.5,0.9)
+    else:
+        leg = TLegend(0.1,0.6,0.5,0.9)
+    leg.SetFillStyle(0)
+    leg.SetBorderSize(0)
+    it=0
+    graphs =[]
+    for run in runs:
+        #rebin throughput to be 70 seconds
+        #thruHists[it].Rebin(5)
+        #rebin lumi to be 70 seconds
+        #lHists[it].Rebin(2)
+        g = getThruGraph(thruHists[it],lHists[it])
+        #add a dummy point to make plotting axis range possible
+        g.SetPoint(g.GetN(),10000,2000)
+        g.GetXaxis().SetRangeUser(0,10000)
+        g.GetYaxis().SetRangeUser(0,8000000)
+        g.SetMarkerColor(it+1)
+        g.SetFillColor(it+1)
+        graphs.append(g)
+        it+=1
+
+    it=0
+    for graph in graphs:
+        graph.SetTitle("Throughput vs. Luminosity")
+        graph.GetXaxis().SetTitle("Instantaneous Luminosity (e30 cm^{-2})")
+        graph.GetYaxis().SetTitle("Throughput (evts/70s)")
+
+        leg.AddEntry(graph,"Run: %s" % runs[it],"f")
+        if it ==0:
+            graph.Draw("ap")
+        else:
+            graph.Draw("psame")
+        it+=1
+    
+    leg.Draw("same")
+    c1.Print("Throughput_vLumi_Runs%s-%s.pdf" % (runs[0],runs[len(runs)-1]))
+    
+
 plotTiming(timingHists)
 plotLogTiming(timingHists)
 plotOverFlow(timingHists)
@@ -323,9 +437,34 @@ for run in runs:
     it+=1
 
 plotTimingVLumiAll(timingByLsHists,lumiHists,runs)
+plotThroughputVLumi(thru5029,lumi5029,runs5029)
+plotThroughputVLumi(thru5028,lumi5028,runs5028)
+plotThroughputVLumi(thru5027,lumi5027,runs5027)
+plotTimingVLumiAll(tbls5029,lumi5029,runs5029)
+plotTimingVLumiAll(tbls5028,lumi5028,runs5028)
+plotTimingVLumiAll(tbls5027,lumi5027,runs5027)
+plotTimingVLumiAll(tbls5026,lumi5026,runs5026)
 plotTimingVLumiAll(tbls5024,lumi5024,runs5024)
 plotTimingVLumiAll(tbls5021,lumi5021,runs5021)
 plotTimingVLumiAll(tbls5020,lumi5020,runs5020)
 plotTimingVLumiAll(tbls5017,lumi5017,runs5017)
 plotTimingVLumiAll(tbls5013,lumi5013,runs5013)
 plotTimingVLumiAll(tbls5005,lumi5005,runs5005)
+
+it=0
+for run in runs5029:
+    print "it: %i run %s" % (it,run)
+    plotThroughputANDTiming(thru5029[it],tbls5029[it],run)
+    it+=1
+
+it=0
+for run in runs5028:
+    print "it: %i run %s" % (it,run)
+    plotThroughputANDTiming(thru5028[it],tbls5028[it],run)
+    it+=1
+
+it=0
+for run in runs5027:
+    print "it: %i run %s" % (it,run)
+    plotThroughputANDTiming(thru5027[it],tbls5027[it],run)
+    it+=1
