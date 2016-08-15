@@ -176,7 +176,7 @@ def customizeMenuForTiming(menu):
     hlt.write(getDQMModule())
     #add multithreading customization
     hlt.write(getThreadConfiguration())
-    
+    hlt.close()
 
 def getTestPath(t):
     return './%s' %t.name
