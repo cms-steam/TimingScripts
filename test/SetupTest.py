@@ -23,8 +23,19 @@ print test
 
 print "making copy of menu and customizing for timing info"
 newhltname = menu.split('.py')[0]+'_'+name+'.py'
-os.system('cp %s %s' %(menu,newhltname)
+os.system('cp %s %s' %(menu,newhltname))
 customizeMenuForTiming(newhltname)
+
+base = open(newhltname,'r')
+lines = base.readlines()
+base.close()
+base = open(newhltname,'w')
+for line in lines:
+    line = line.replace('NTHREADS',str(currentTest.nthreads))
+    line = line.replace('DQMOUTPUTPATH','.')
+    base.write(line)
+
+base.close()
 
 #save the test configuration
 savefile = "test_cfg_%s.txt" % currentTest.name
