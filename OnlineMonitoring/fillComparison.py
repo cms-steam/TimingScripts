@@ -7,6 +7,7 @@ parser = argparse.ArgumentParser(description='script to plot the timing vs. lumi
 parser.add_argument("--fills",type=str,help='list of fill numbers (e.g 5010,5011,etc)',required=True,nargs=1)
 parser.add_argument("--runs",type=str,help='list of runs comma separated intrafill and colon separated interfill (e.g. 275000,275001:275100,275101)',required=True,nargs=1)
 parser.add_argument("--hlt",type=str,help='option list of menu names, should be one for each fill',required=False,nargs=1)
+parser.add_argument("--cmssw",type=str,help='option list of cmssw version used, should be one for each fill',required=False,nargs=1)
 
 args = parser.parse_args()
 
@@ -41,10 +42,11 @@ def getGraph(tHists,lHists):
 
 
 class fill(object):
-    def __init__(self,number,runs,menu):
+    def __init__(self,number,runs,menu,cmssw):
         self.number = number
         self.runs = runs
         self.menu = menu
+        self.cmssw = cmssw
         self.tHists = []
         self.lHists = []
         self.lFiles = []
@@ -80,7 +82,11 @@ for f,it in zip(fillnumbers,range(0,1000)):
         hltname=args.hlt[0].split(',')[it]
     else:
         hltname=''
-    fills.append( fill(fillnumbers[it],runnumbers[it].split(','),hltname) )
+    if args.cmssw is not None:
+        cmsswname = args.cmssw[0].split(',')[it]
+    else:
+        cmsswname = ''
+    fills.append( fill(fillnumbers[it],runnumbers[it].split(','),hltname,cmsswname) )
 
 
 #now add histograms to fills
@@ -124,6 +130,8 @@ for f,it in zip(fills, range(0,10000)):
     legtext ="Fill %s" % f.number
     if f.menu is not '':
         legtext+="; HLT Menu: %s" % f.menu
+    if f.cmssw is not '':
+        legtext+="; %s" % f.cmssw
     leg.AddEntry(f.graph,legtext,"f")
 
 leg.SetBorderSize(0)
