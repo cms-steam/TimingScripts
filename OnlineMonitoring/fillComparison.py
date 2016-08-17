@@ -18,6 +18,15 @@ class fill(object):
     self.number = number
     self.runs = runs
     self.menu = menu
+    self.tHists = []
+    self.lHists = []
+
+    def addTimeHist(self,f):
+        self.tHists.append( f.Get("/HLT/TimerService/Running 4 processes/event_byls"))
+
+    def addLumiHist(self,f):
+        self.lHists.append( f.Get("/Scal/LumiScalers/Instant_Lumi"))
+        
 
 #get fills
 fillnumbers = args.fills[0].split(',')
@@ -33,5 +42,13 @@ for f in fillnumbers:
     else:
         hltname=''
     fills.append( fill(fillnumbers[it],runnumbers[it],hltname) )
+
+#now add histograms to fills
+for f in fills:
+    for r in f.runs:
+        timefname = "timeByLs_rootFiles/Global__Online__ALL__run%i.root" %r
+        f.addTimeHist(TFile(timefname))
+        lumifname = "lumi_rootFiles/Global__Online__ALL__run%i.root" %r
+        f.addLumiHist(TFile(lumifname))
 
 #make list of graphs corresponding to each fill
