@@ -16,26 +16,28 @@ args = parser.parse_args()
 from ROOT import *
 
 def getGraph(tHists,lHists):
+    print "histogram lists"
+    print tHists,lHists
+    print "length of timing hists: %i" %len(tHists)
     times = []
     lumis = []
     npoints=0
     for tHist,lHist in zip(tHists,lHists):
         for i in range(0,tHist.GetNbinsX()):
-        #print "timing: %f ; lumi: %f" % (tHist.GetBinContent(i+1),lHist.GetBinContent(i+1))
-            if (tHist.GetBinContent(i+1)>0 or i<20):            
+            if (tHist.GetBinContent(i+1)>0 or i<20):
                 times.append(tHist.GetBinContent(i+1))
                 lumis.append(lHist.GetBinContent(i+1))
                 npoints+=1
             
-        g = TGraph(npoints)
-        for i in range(0,npoints):
-            g.SetPoint(i,lumis[i],times[i])
+    g = TGraph(npoints)
+    for i in range(0,npoints):
+        g.SetPoint(i,lumis[i],times[i])
 
 #    g.SetMarkerStyle(22)
-        g.SetTitle("Processing Time vs. Luminosity")
-        g.GetXaxis().SetTitle("Instantaneous Luminosity (e30 cm^{-2})")
-        g.GetYaxis().SetTitle("Processing time (ms)")
-        return g
+    g.SetTitle("Processing Time vs. Luminosity")
+    g.GetXaxis().SetTitle("Instantaneous Luminosity (e30 cm^{-2})")
+    g.GetYaxis().SetTitle("Processing time (ms)")
+    return g
 
 
 class fill(object):
@@ -67,7 +69,7 @@ class fill(object):
 fillnumbers = args.fills[0].split(',')
 runnumbers = args.runs[0].split(':')
 
-
+print fillnumbers, runnumbers
 
 #create list of fills
 fills = []
@@ -98,7 +100,7 @@ for f in fills:
         f.lHists.append( lf.Get("/Scal/LumiScalers/Instant_Lumi"))
     for tf in f.tFiles:
         f.tHists.append( tf.Get("/HLT/TimerService/Running 4 processes/event_byls") )
-    print f.lHists, f.tHists
+    #print f.lHists, f.tHists
 
 #set multigraph
 for f in fills:
