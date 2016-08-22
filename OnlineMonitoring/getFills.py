@@ -4,6 +4,8 @@ import socket
 # For the parsing
 import re
 
+import sys
+sys.path.append('../Classes/')
 
 class DBQueryTool:
 
@@ -38,9 +40,13 @@ fills = [5027,5028,5029,5030,5038,5043,5045,5048,5052,5056,5060,5069,5071,5072,5
 
 if __name__ == "__main__":
     query_tool = DBQueryTool()
-
-    for fill in fills:
-        table = query_tool.getRunsFromFill(fill)
+    import urllib2
+    import os
+    import xml.etree.ElementTree
+    from dqmFunctions import *
+    goodFills = []
+    for f in fills:
+        table = query_tool.getRunsFromFill(f)
  #   print table
         runs = []
         for run in table:
@@ -54,8 +60,31 @@ if __name__ == "__main__":
             cleanedrun = cleanedrun.replace(')','')
             cleanedrun = cleanedrun.replace(',','')
             cleanedruns.append(cleanedrun)
-        print cleanedruns
-    #now we have a list of the run numbers we want, so now check that stable beams were happening
-#    for run in cleanedruns:
-        
+        #print cleanedruns
+        run =cleanedruns[0]
+        url="https://cmswbm.web.cern.ch/cmswbm/cmsdb/servlet/RunSummary?RUN=%s&FORMAT=XML" % run
+        #setup cern proxy - each cookie is only good for that website so always have to redo
+        proxy="cern-get-sso-cookie --krb -r -u \"%s\" -o ~/private/ssocookie.txt" % url
+        os.system(proxy)
+        #now download website
+        curlcom = "curl -L --cookie ~/private/ssocookie.txt --cookie-jar ~/private/ssocookie.txt \"%s\" >& Run%s.xml" % (url,run)
+        os.system(curlcom)
+        #parse xml - doesn't work because of format of curl includes crap at top so just open file to get info
+        runinfo = open('Run%s.xml' %run,'r')
+        hlt=''
+        cmssw=''
+        for line in runinfo:
+            if line.find('hltKeyDescription')!=-1:
+                hlt = line.replace("<hltKeyDescription>","")
+                hlt = hlt.replace("</hltKeyDescription>","")
+            if line.find("hltVersion")!=-1:
+                cmssw = line.replace("<hltVersion>","")
+                cmssw = cmssw.replace("</hltVersion>","")
+                
+        print "run: %s, hlt: %s, cmssw: %s" % (run,hlt,cmssw)
+        goodFills.append( fill(f,cleanedruns,hlt,cmssw))
     
+        
+
+for f in goodFills:
+    f.printFill()
