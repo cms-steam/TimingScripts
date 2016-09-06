@@ -20,6 +20,8 @@ if not os.path.isdir("./timeByLs_rootFiles"):
     os.system("mkdir timeByLs_rootFiles")
 if not os.path.isdir("./throughput_rootFiles"):
     os.system("mkdir throughput_rootFiles")
+if not os.path.isdir("./lumi_rootFiles"):
+    os.system("mkdir lumi_rootFiles")
 
 
 for run in runs:
