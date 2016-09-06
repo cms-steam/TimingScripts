@@ -41,31 +41,6 @@ def getGraph(tHists,lHists):
     return g
 
 
-class fill(object):
-    def __init__(self,number,runs,menu,cmssw):
-        self.number = number
-        self.runs = runs
-        self.menu = menu
-        self.cmssw = cmssw
-        self.tHists = []
-        self.lHists = []
-        self.lFiles = []
-        self.tFiles = []
-        self.graph = TGraph()
-
-    def addTimeHist(self,f):
-        hist = f.Get("/HLT/TimerService/Running 4 processes/event_byls")
-        print hist
-        self.tHists.append(hist)
-
-    def addLumiHist(self,f):
-        hist = f.Get("/Scal/LumiScalers/Instant_Lumi")
-        print hist
-        self.lHists.append(hist)
-        
-    def SetGraph(self):
-        self.graph = getGraph(self.tHists,self.lHists)
-        self.graph.SetTitle("Processing Time vs. Luminosity; Luminosity (e30 cm^{-2}); Average Processing Time")
 
 #get fills
 fillnumbers = args.fills[0].split(',')
@@ -115,14 +90,14 @@ for f in fills:
 #now draw
 
 c = TCanvas()
-leg = TLegend(0.1,0.5,0.4,0.9)
+leg = TLegend(0.1,0.5,0.5,0.9)
 
 for f,it in zip(fills, range(0,10000)):
     f.graph.SetMarkerColor(it+1)
     f.graph.SetFillColor(it+1)
     if it==0:
+        f.graph.GetXaxis().SetLimits(0,13000)
         f.graph.Draw("AP")
-        #f.graph.GetXaxis().SetRangeUser(0,15000)
         #f.graph.GetYaxis().SetRangeUser(0,250)
         #f.graph.Draw("AP")
     else:
