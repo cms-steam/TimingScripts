@@ -158,9 +158,12 @@ process.TimingOutput = cms.EndPath( process.fastTimerServiceClient + process.dqm
 
 def getThreadConfiguration():
     return """
-process.options.numberOfThreads = cms.untracked.uint32( NTHREADS )
-process.options.numberOfStreams = cms.untracked.uint32( NTHREADS ) #same number as above
-process.options.sizeOfStackForThreadsInKB = cms.untracked.uint32( 10*1024 )
+process.options = cms.untracked.PSet(
+    wantSummary = cms.untracked.bool( True ),
+    numberOfThreads = cms.untracked.uint32( NTHREADS ),
+    numberOfStreams = cms.untracked.uint32( NTHREADS ),
+    sizeOfStackForThreadsInKB = cms.untracked.uint32( 10*1024 )
+)
 """
 
 def customizeMenuForTiming(menu):
