@@ -15,11 +15,12 @@ def getAverageTimeForLumiRange(lumilow,lumihigh,lhists,thists):
     time=0.0
     for thist,lhist in zip(thists,lhists):
         for i in range(1,lhist.GetNbinsX()+1):
-            lumi = lhist.GetBinContent(i)
-            print lumi
+            lumi = lhist.GetBinContent(i)     
+            print lumi,lumilow,lumihigh       
             if lumi>=lumilow and lumi<lumihigh:
-                time+=thist.GetBinContent(i)
+                time+=thist.GetBinContent(i)                
                 ntimes+=1
+                print time,ntimes
 
     if ntimes!=0:
         time = time/float(ntimes)
@@ -40,6 +41,7 @@ thists = []
 lhists = []
 tfiles = []
 lfiles = []
+ctemp = TCanvas()
 for run in runs:
     timef = TFile("timeByLs_rootFiles/Global__Online__ALL__run%s.root" %run)
     tfiles.append(timef)
@@ -47,21 +49,18 @@ for run in runs:
     lfiles.append(lumif)
 
 for tfile in tfiles:
-    timehist = timef.Get("/HLT/TimerService/Running 4 processes/event_byls")
+    timehist = tfile.Get("/HLT/TimerService/Running 4 processes/event_byls")
     thists.append(timehist)
 
 for lfile in lfiles:
-    lumihist = lumif.Get("/Scal/LumiScalers/Instant_Lumi")
+    lumihist = lfile.Get("/Scal/LumiScalers/Instant_Lumi")
     lhists.append(lumihist)
-
-print thists
-print lhists
 
 #now get average timing for each lumibin
 times=[] #will hold average time for each bin
 lumis=[] #note that this will be the central value of each bin
 for i in range(0,len(lumibins)-1): # len(lumis)-1 so we don't access outside the list
-    time =  getAverageTimeForLumiRange(lumibins[i],lumibins[i+1],lhists,thists)
+    time =  getAverageTimeForLumiRange(float(lumibins[i]),float(lumibins[i+1]),lhists,thists)
     times.append(time)
     lumi = (int(lumibins[i])+int(lumibins[i+1]))/2.0
     lumis.append(lumi)
@@ -69,13 +68,17 @@ for i in range(0,len(lumibins)-1): # len(lumis)-1 so we don't access outside the
 
 #now make TGraph and plot
 c = TCanvas()
-g = TGraph(len(lumis),lumis,times)
+g = TGraph(len(lumis))
+for i in range(0,len(lumis)):
+    g.SetPoint(i,lumis[i],times[i])
+
 g.SetMarkerStyle(22)
 g.SetMarkerColor(kBlack)
 g.Draw("ap")
 g.SetTitle("Processing Time vs. Luminosity - Averaged")
 g.GetXaxis().SetTitle("Average Luminosity (1e33)")
 g.GetYaxis().SetTitle("Average Processing Time")
+g.GetXaxis().SetRangeUser(lumis[0],lumis[-1])
 g.Draw("ap")
 
 name = "Timing_v_AveragedLumi_Run%s-%s" % (runs[0],runs[-1])
