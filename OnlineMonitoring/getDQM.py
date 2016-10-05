@@ -34,7 +34,10 @@ for run in runs:
     os.system(command)
     #cd to lumi directory
     os.chdir('../lumi_rootFiles')
-    command ="python ../dqm-acces.py -s https://cmsweb.cern.ch/dqm/online/data/json -f \"/Scal/LumiScalers/Instant_Lumi\" -e \"run == %i and match(\'/Global/Online/ALL\', dataset)\" -r -w" % run
+    if run < 281663:
+        command ="python ../dqm-acces.py -s https://cmsweb.cern.ch/dqm/online/data/json -f \"/Scal/LumiScalers/Instant_Lumi\" -e \"run == %i and match(\'/Global/Online/ALL\', dataset)\" -r -w" % run
+    else:
+        command ="python ../dqm-acces.py -s https://cmsweb.cern.ch/dqm/online/data/json -f \"/HLT/LumiMonitoring/lumiVsLS\" -e \"run == %i and match(\'/Global/Online/ALL\', dataset)\" -r -w" % run
     os.system(command)
     #throughput
     os.chdir('../throughput_rootFiles')
