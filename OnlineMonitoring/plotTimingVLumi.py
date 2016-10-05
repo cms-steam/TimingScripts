@@ -7,7 +7,7 @@ parser.add_argument("--lumibins",type=str,help='comma separated list of lumi bin
 
 args = parser.parse_args()
 
-def selectTimesFromLumi(lumilow,lumihigh,lhists,thists):
+def getAverageTimeForLumiRange(lumilow,lumihigh,lhists,thists):
     ntimes=0
     time=0.0
     for lhist,thist in zip(lhists,thists):
@@ -24,7 +24,7 @@ def selectTimesFromLumi(lumilow,lumihigh,lhists,thists):
 runs = args.runs[0].split(',')
 
 #get lumi bins
-lumis = args.lumibins[0].split(',')
+lumibins = args.lumibins[0].split(',')
 
 
 #get timing and lumi hists
@@ -39,4 +39,29 @@ for run in runs:
     lhists.append(lumihist)
 
 
+#now get average timing for each lumibin
+times=[] #will hold average time for each bin
+lumis=[] #note that this will be the central value of each bin
+for i in range(0,len(lumibins)-1): # len(lumis)-1 so we don't access outside the list
+    time =  getAverageTimeForLumiRange(lumibins[i],lumibins[i+1],thists,lhists)
+    times.append(time)
+    lumi = (lumibins[i]+lumibins[i+1])/2.0
+    lumis.append(lumi)
 
+
+#now make TGraph and plot
+c = TCanvas()
+g = TGraph(len(lumis),lumis,times)
+g.SetMarkerStyle(22)
+g.SetMarkerColor(kBlack)
+g.Draw("ap")
+g.SetTitle("Processing Time vs. Luminosity - Averaged")
+g.GetXaxis().SetTitle("Average Luminosity (1e33)")
+g.GetYaxis().SetTitle("Average Processing Time")
+g.Draw("ap")
+
+name = "Timing_v_AveragedLumi_Run%s-%s" % (runs[0],runs[-1])
+c.Print(name+".root")
+c.Print(name+".png")
+c.Print(name+".pdf")
+c.Print(name+".C")
