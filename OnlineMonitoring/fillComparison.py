@@ -13,6 +13,9 @@ args = parser.parse_args()
 
 #import helpful plotting functions
 #from plotDQM import getGraph
+import sys
+sys.path.append('../Classes/')
+from dqmFunctions import *
 
 from ROOT import *
 
