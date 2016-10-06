@@ -19,30 +19,6 @@ from dqmFunctions import *
 
 from ROOT import *
 
-def getGraph(tHists,lHists):
-    print "histogram lists"
-    print tHists,lHists
-    print "length of timing hists: %i" %len(tHists)
-    times = []
-    lumis = []
-    npoints=0
-    for tHist,lHist in zip(tHists,lHists):
-        for i in range(0,tHist.GetNbinsX()):
-            if (tHist.GetBinContent(i+1)>0 or i<20):
-                times.append(tHist.GetBinContent(i+1))
-                lumis.append(lHist.GetBinContent(i+1))
-                npoints+=1
-            
-    g = TGraph(npoints)
-    for i in range(0,npoints):
-        g.SetPoint(i,lumis[i],times[i])
-
-#    g.SetMarkerStyle(22)
-    g.SetTitle("Processing Time vs. Luminosity")
-    g.GetXaxis().SetTitle("Instantaneous Luminosity (e30 cm^{-2})")
-    g.GetYaxis().SetTitle("Processing time (ms)")
-    return g
-
 
 
 #get fills
