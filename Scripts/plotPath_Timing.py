@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 
+
 #setup argument parser
 import argparse
 
@@ -39,7 +40,8 @@ def plotPathComparison(f,run,process,paths):
     tHists = []
     tFile = TFile(f)
     for p in paths:
-        hName = "DQMData/Run %s/HLT/Run summary/TimerService/Running 1 processes/process %s/Paths/%s_total" % (run,process,p)
+#        hName = "DQMData/Run %s/HLT/Run summary/TimerService/Running 1 processes/process %s/Paths/%s_total" % (run,process,p)
+        hName = "DQMData/Run %s/HLT/Run summary/TimerService/process %s paths/path %s/path time_real" % (run,process,p)
         tHists.append(tFile.Get(hName))
 
     leg = TLegend(0.4,0.6,0.9,0.9,"")
@@ -81,7 +83,8 @@ def plotInputComparison(files,runs,processes,path):
     j=0
     Thists=[]
     while j<len(Tfiles):
-        dirname="DQMData/Run %s/HLT/Run summary/TimerService/Running 1 processes/process %s/Paths/%s_total" % (runs[j],processes[j],path)
+#        dirname="DQMData/Run %s/HLT/Run summary/TimerService/Running 1 processes/process %s/Paths/%s_total" % (runs[j],processes[j],path)
+        dirname="DQMData/Run %s/HLT/Run summary/TimerService/process %s paths/path %s/path time_real" % (runs[j],processes[j],path)
         print dirname
         hist=Tfiles[j].Get(dirname)
 

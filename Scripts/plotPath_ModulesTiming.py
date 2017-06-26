@@ -39,7 +39,8 @@ def plotPathComparison(f,run,process,paths):
     tHists = []
     tFile = TFile(f)
     for p in paths:
-        hName = "DQMData/Run %s/HLT/Run summary/TimerService/Running 1 processes/process %s/Paths/%s_module_total" % (run,process,p)
+#        hName = "DQMData/Run %s/HLT/Run summary/TimerService/Running 1 processes/process %s/Paths/%s_module_total" % (run,process,p)
+        hName = "DQMData/Run %s/HLT/Run summary/TimerService/process %s paths/path %s/module_time_real_total" % (run,process,p)
         tHists.append(tFile.Get(hName))
 
     leg = TLegend(0.4,0.6,0.9,0.9,"")
@@ -81,7 +82,8 @@ def plotInputComparison(files,runs,processes,path):
     j=0
     Thists=[]
     while j<len(Tfiles):
-        dirname="DQMData/Run %s/HLT/Run summary/TimerService/Running 1 processes/process %s/Paths/%s_module_total" % (runs[j],processes[j],path)
+#        dirname="DQMData/Run %s/HLT/Run summary/TimerService/Running 1 processes/process %s/Paths/%s_module_total" % (runs[j],processes[j],path)
+        dirname="DQMData/Run %s/HLT/Run summary/TimerService/process %s paths/path %s/module_time_real_total" % (runs[j],processes[j],path)
         print dirname
         hist=Tfiles[j].Get(dirname)
 
@@ -113,7 +115,9 @@ def plotInputComparison(files,runs,processes,path):
             Thists[k].SetLineColor(k+1)
             Thists[k].Draw("same")
         #write name in full
-        name = "Mean: %f" % Thists[k].GetMean()
+#        name = "Mean: %f" % Thists[k].GetMean()
+        name = path
+        print "name is = "+name
         if args.ext:
             Thists[k].GetXaxis().SetRangeUser(0,2000)
         else:

@@ -39,7 +39,8 @@ def plotPathComparison(f,run,process,paths):
     tHists = []
     tFile = TFile(f)
     for p in paths:
-        hName = "DQMData/Run %s/HLT/Run summary/TimerService/Running 1 processes/process %s/Paths/%s_module_counter" % (run,process,p)
+#        hName = "DQMData/Run %s/HLT/Run summary/TimerService/Running 1 processes/process %s/Paths/%s_module_counter" % (run,process,p)
+        hName = "DQMData/Run %s/HLT/Run summary/TimerService/process %s paths/path %s/module_counter" % (run,process,p)
         tHists.append(tFile.Get(hName))
 
     leg = TLegend(0.4,0.6,0.9,0.9,"")
@@ -81,7 +82,8 @@ def plotInputComparison(files,runs,processes,path):
     j=0
     Thists=[]
     while j<len(Tfiles):
-        dirname="DQMData/Run %s/HLT/Run summary/TimerService/Running 1 processes/process %s/Paths/%s_module_counter" % (runs[j],processes[j],path)
+#        dirname="DQMData/Run %s/HLT/Run summary/TimerService/Running 1 processes/process %s/Paths/%s_module_counter" % (runs[j],processes[j],path)
+        dirname="DQMData/Run %s/HLT/Run summary/TimerService/process %s paths/path %s/module_counter" % (runs[j],processes[j],path)
         print dirname
         hist=Tfiles[j].Get(dirname)
 
@@ -95,8 +97,8 @@ def plotInputComparison(files,runs,processes,path):
 
     while k< len(Thists):
         if k==0:
-            Thists[k].Scale( 1.0 / Thists[k].Integral() )
-            Thists[k].GetYaxis().SetRangeUser(0.000008,0.2)
+            #Thists[k].Scale( 1.0 / Thists[k].Integral() )
+            #Thists[k].GetYaxis().SetRangeUser(0.000008,0.2)
             print "lower bound of bin 100: %i" % Thists[k].GetBinCenter(100)
             print "percentage of events running particle flow: %i " % Thists[k].Integral(100,500)
             Thists[k].SetLineWidth(2)
@@ -108,17 +110,21 @@ def plotInputComparison(files,runs,processes,path):
             Thists[k].Draw()
 
         else:
-            Thists[k].Scale( 1.0 / Thists[k].Integral() )
+            #Thists[k].Scale( 1.0 / Thists[k].Integral() )
             Thists[k].SetLineWidth(2)
             Thists[k].SetLineColor(k+1)
             Thists[k].Draw("same")
         #write name in full
-        name = "Mean: %f" % Thists[k].GetMean()
+#        name = "Mean: %f" % Thists[k].GetMean()
+        name = path
+#        print "No. o bins is = "+str(Thists[k].GetNbinsX())
+
         if args.ext:
             Thists[k].GetXaxis().SetRangeUser(0,2000)
         else:
             Thists[k].GetXaxis().SetRangeUser(0,400)
-  
+
+#        Thists[k].GetXaxis().SetRangeUser(210,249)  
         leg.AddEntry(Thists[k],name,"l")
         k+=1
         

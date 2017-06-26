@@ -25,7 +25,8 @@ void TimingAndRates(float time, std::string filename,int run=1,std::string outna
 
   TFile* file = new TFile(filename.c_str());
   std::stringstream dirname;
-  dirname<<"DQMData/Run "<<run<<"/HLT/Run summary/TimerService/Running 1 processes/process "<<process<<"/Paths";
+  dirname<<"DQMData/Run "<<run<<"/HLT/Run summary/TimerService/process "<<process<<" paths";
+  //std::cout<<"dirname = "<<(dirname.str()).c_str()<<endl;
   file->cd( (dirname.str()).c_str() );
   std::cout<<dirname.str()<<std::endl;
   TIter next(gDirectory->GetListOfKeys());
@@ -33,74 +34,47 @@ void TimingAndRates(float time, std::string filename,int run=1,std::string outna
   
   while ((key = (TKey*)next())) {
     TClass *cl = gROOT->GetClass(key->GetClassName());
-    if (!cl->InheritsFrom("TH1")) continue;
-    TH1 *h = (TH1*)key->ReadObj();
+//    if (!cl->InheritsFrom("TH1")) continue;
+    if (!cl->InheritsFrom("TDirectory")) continue;
+//    TH1 *h = (TH1*)key->ReadObj();
+    TDirectory *pathTDir = (TDirectory*)key->ReadObj();
     //    names.push_back(h->GetName());
-    string title = h->GetTitle();
-    string name = h->GetName();
+//    string title = h->GetTitle();
+    string pathdirname = pathTDir->GetName();
+    string fullpathdir = dirname.str()+"/"+pathdirname;
+    string path;
+
+//    string name = h->GetName();
+    //Get rid of "endpath " and "path " in names
     size_t pos;
 
-    if(title.find("v2")!=string::npos){
-      pos = title.find("v2");
+    if(pathdirname.find("endpath ")!=string::npos){
+        path = pathdirname.erase(0,8);
     }
-    else if(title.find("v1")!=string::npos){
-      pos=title.find("v1");
+    else if(pathdirname.find("path ")!=string::npos){
+        path=pathdirname.erase(0,5);
     }
-    else if(title.find("v3")!=string::npos){
-      pos=title.find("v3");
-    }
-    else if(title.find("v4")!=string::npos){
-      pos=title.find("v4");
-    }
-    string path(title,0,pos-1);
+
+    //cd into paths directory and get the right histograma
+    file->cd(fullpathdir.c_str());
+//    string path(title,0,pos-1);
+    //Do rates
     float rate;
-
-    if(title.find("module counter")!=string::npos){
- 
-      TAxis* axis = h->GetXaxis();
-      int nbins = h->GetNbinsX();
-      for(int i = 1; i<=nbins; i++){
-	string label = axis->GetBinLabel(i);
-	if(label.find("hltBoolEnd")!=string::npos){
-       	  //push back rate to vector
-	  rate = h->GetBinContent(i)/(time);
-	  vRates.push_back(rate);
-	  vNames.push_back(path);
-	}
-      }
-      
+    TH1* hcounts =(TH1*)(gDirectory->GetKey("module_counter"))->ReadObj();
+        //if(title.find("module counter")!=string::npos){
+    TAxis* axis = hcounts->GetXaxis();
+    int nbins = hcounts->GetNbinsX();
+    for(int i = 1; i<=nbins; i++){
+        string label = axis->GetBinLabel(i);
+        if(label.find("hltBoolEnd")!=string::npos){
+            //push back rate to vector
+            rate = hcounts->GetBinContent(i)/(time);
+            vRates.push_back(rate);
+            vNames.push_back(path);
+        }
     }
 
-  }
-
-  TIter next2(gDirectory->GetListOfKeys());
-  TKey *key2;
-
-
-  while ((key2 = (TKey*)next2())) {
-    TClass *cl = gROOT->GetClass(key2->GetClassName());
-    if (!cl->InheritsFrom("TH1")) continue;
-    TH1 *h = (TH1*)key2->ReadObj();
-    //    names.push_back(h->GetName());
-    string title = h->GetTitle();
-    string name = h->GetName();
-    float mean;
-    size_t pos;
-
-    if(title.find("v2")!=string::npos){
-      pos = title.find("v2");
-    }
-    else if(title.find("v1")!=string::npos){
-      pos=title.find("v1");
-    }
-    else if(title.find("v3")!=string::npos){
-      pos=title.find("v3");
-    }
-    else if(title.find("v4")!=string::npos){
-      pos=title.find("v4");
-    }
-    string path(title,0,pos-1);
-
+    //Do time
     //make sure path is in rates
     bool inRates=false;
     for(size_t j=0; j<vNames.size();j++){
@@ -108,19 +82,16 @@ void TimingAndRates(float time, std::string filename,int run=1,std::string outna
     }
     
     if(!inRates) continue;
+    //std::cout<<"Checking path "<<path<<endl;
+    
+    float mean;
+    TH1* htime =(TH1*)(gDirectory->GetKey("path time_real"))->ReadObj();
+    mean = htime->GetMean();
+    vTimes.push_back(mean);
+      
+    
 
-
-    if(name.find("total")!=string::npos && name.find("module_total")==string::npos){
-      //handle special case with 'totalOR' in name
-      if(name.find("totalOR")!=string::npos && !(name.find("total",name.find("total"+1))!=string::npos)) continue;
-      if(name.find("DQMOutput")!=string::npos) continue;
-      //      std::cout<<name<<" with mean: "<<h->GetMean()<<std::endl;
-      mean = h->GetMean();
-      vTimes.push_back(mean);
-     
-    }
   }
-
 
   outfile<<"Path,TotalTime(ms),Rate(Hz)\n";
   for(unsigned int k =0; k<vNames.size(); k++){

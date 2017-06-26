@@ -70,7 +70,8 @@ while i<len(files):
 j=0
 Thists=[]
 while j<len(Tfiles):
-    dirname="DQMData/Run %s/HLT/Run summary/TimerService/Running 1 processes/process %s/all_paths" % (runs[j],processes[j])
+#    dirname="DQMData/Run %s/HLT/Run summary/TimerService/Running 1 processes/process %s/all_paths" % (runs[j],processes[j])
+    dirname="DQMData/Run %s/HLT/Run summary/TimerService/process %s time_real" % (runs[j],processes[j])
     print dirname
     hist=Tfiles[j].Get(dirname)
     print "type is ",type(hist)
